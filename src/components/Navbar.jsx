@@ -7,11 +7,10 @@ const Logo = () => (
   <img 
     src={logoSvg} 
     alt="StudyByte Logo" 
-    height="48" 
-    width="48" 
+    height="64" 
+    width="64" 
     className="logo-icon"
     style={{ backgroundColor: 'transparent' }}
-    
   />
 )
 
