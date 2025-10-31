@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getCourseItemsBySpecificCategory, getCourse } from '../firebase/api'
+import { safeOpenLink, createLinkHandler } from '../utils/linkHandler'
 
 function displayName(item) {
   // With new structure, we have the name directly
@@ -149,16 +150,38 @@ export default function CategoryList() {
             const title = displayName(item)
             
             return (
-              <a 
-                key={index} 
-                href={item.url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="block bg-white/5 hover:bg-white/10 rounded p-4 transition-all duration-200 border border-transparent w-[360px] shadow-lg shadow-black/20"
-              >
-                <h3 className="font-medium text-lg mb-3 truncate" style={{color: '#c7c7c7'}}>{title}</h3>
-                <div className="text-yellow-500 text-sm font-medium">Open Link</div>
-              </a>
+              <div key={index} className="relative group">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const linkHandler = createLinkHandler(item.url, {
+                      fallbackMessage: `Popup blocked! The link "${title}" couldn't open automatically.`
+                    })
+                    linkHandler.open()
+                  }}
+                  className="block bg-white/5 hover:bg-white/10 rounded p-4 transition-all duration-200 border border-transparent w-[360px] shadow-lg shadow-black/20 text-left w-full"
+                >
+                  <h3 className="font-medium text-lg mb-3 truncate" style={{color: '#c7c7c7'}}>{title}</h3>
+                  <div className="text-yellow-500 text-sm font-medium">Open Link →</div>
+                </button>
+                
+                {/* Options dropdown */}
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const linkHandler = createLinkHandler(item.url)
+                      linkHandler.showOptions()
+                    }}
+                    className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors"
+                    title="More options"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             )
           })}
         </div>

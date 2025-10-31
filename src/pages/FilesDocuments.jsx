@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getCourse } from '../firebase/api'
+import { safeOpenLink, createLinkHandler } from '../utils/linkHandler'
 
 export default function FilesDocuments() {
   const { courseId } = useParams()
@@ -156,27 +157,47 @@ export default function FilesDocuments() {
                   {folder.files && folder.files.length > 0 ? (
                     <div className="files-grid gap-4 mt-4">
                       {folder.files.map((file, fileIndex) => (
-                        <a
-                          key={fileIndex}
-                          href={file.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block bg-white/5 hover:bg-white/15 rounded-lg p-4 transition-all duration-200 border border-white/10 hover:border-white/20 shadow-sm hover:shadow-md transform hover:scale-105"
-                        >
-                          <div className="flex items-start">
-                            <div className="mr-3 mt-1">
-                              {getFileIcon(file.file_name)}
+                        <div key={fileIndex} className="relative group">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              const linkHandler = createLinkHandler(file.file_url, {
+                                fallbackMessage: `Popup blocked! The file "${file.file_name}" couldn't open automatically.`
+                              })
+                              linkHandler.open()
+                            }}
+                            className="block bg-white/5 hover:bg-white/15 rounded-lg p-4 transition-all duration-200 border border-white/10 hover:border-white/20 shadow-sm hover:shadow-md transform hover:scale-105 w-full text-left"
+                          >
+                            <div className="flex items-start">
+                              <div className="mr-3 mt-1">
+                                {getFileIcon(file.file_name)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-base mb-2 mt-1 truncate" style={{color: '#c7c7c7'}} title={file.file_name}>
+                                  {file.file_name || 'Untitled File'}
+                                </h4>
+                                <p className="text-yellow-500 text-xs font-medium">
+                                  Open File →
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-base mb-2 mt-1 truncate" style={{color: '#c7c7c7'}} title={file.file_name}>
-                                {file.file_name || 'Untitled File'}
-                              </h4>
-                              <p className="text-yellow-500 text-xs font-medium">
-                                Open File →
-                              </p>
-                            </div>
+                          </button>
+                          
+                          {/* Options dropdown */}
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                const linkHandler = createLinkHandler(file.file_url)
+                                linkHandler.showOptions()
+                              }}
+                              className="w-6 h-6 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors text-xs"
+                              title="More options"
+                            >
+                              ⋮
+                            </button>
                           </div>
-                        </a>
+                        </div>
                       ))}
                     </div>
                   ) : (
