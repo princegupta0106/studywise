@@ -1,3 +1,5 @@
+    /* src/index.css or src/style.css */
+    @import 'tailwindcss';
 :root{
 	/* VS Code inspired theme - easier on the eyes */
 	--bg: #17141b; /* VS Code dark background */

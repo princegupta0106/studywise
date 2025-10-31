@@ -414,18 +414,6 @@ export default function SeedPage() {
           )}
         </div>
       )}
-
-      {guideResult && (
-        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-green-700">
-          <div className="font-medium">{guideResult.message}</div>
-          {guideResult.success && (
-            <div className="mt-2 text-sm">
-              <p><strong>Added Guide Items:</strong> {guideResult.addedItems}</p>
-              <p><strong>Total Course Items:</strong> {guideResult.totalItems}</p>
-            </div>
-          )}
-        </div>
-      )}
       
       {error && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-600">
