@@ -3,7 +3,8 @@ import React from 'react'
 const Links = () => {
   const links = [
     { id: 1, name: 'BITS Library Koha (Book Search)', url: 'https://bitspilani-opac.kohacloud.in/' },
-    { id: 2, name: 'SWD Website', url: 'https://swd.bits-pilani.ac.in/' },
+    { id: 2, name: 'AUGSD / AGSR Website', url: 'https://academic.bits-pilani.ac.in/' },
+    { id: 9, name: 'SWD Website', url: 'https://swd.bits-pilani.ac.in/' },
     { id: 3, name: 'Nalanda (Learning Management)', url: 'https://nalanda-aws.bits-pilani.ac.in/' },
     { id: 4, name: 'Library Website', url: 'https://library.bits-pilani.ac.in/' },
     { id: 5, name: 'ERP Portal', url: 'https://erp.bits-pilani.ac.in/' },
