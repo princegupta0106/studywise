@@ -1,0 +1,600 @@
+:root{
+	/* VS Code inspired theme - easier on the eyes */
+	--bg: #17141b; /* VS Code dark background */
+	--surface: hwb(270 10% 88%); /* VS Code sidebar/panel background */
+	--card: #262630; /* VS Code elevated surface */
+	--card-hover: #272730; /* VS Code hover state */
+	--border: #3e3e4230; /* VS Code border color */
+	--muted: #a1a1a1; /* VS Code secondary text */
+	--text: #cccccc; /* VS Code primary text - softer than pure white */
+	--text-bright: #ffffff; /* For headings and emphasis */
+	--accent: #007acc; /* VS Code blue accent */
+	--accent-600: #005a9e;
+	--accent-hover: #1177bb;
+	--success: #89d185; /* VS Code green */
+	--warning: #d19a66; /* VS Code orange/amber */
+	--danger: #f14c4c; /* VS Code red */
+	
+	/* Additional vibrant colors for variety */
+	--purple: #c586c0; /* VS Code purple/magenta */
+	--cyan: #4ec9b0; /* VS Code cyan/teal */
+	--pink: #d67ad2; /* VS Code light purple */
+	--orange: #ce9178; /* VS Code string color */
+	--yellow: #ffdd44; /* Bright yellow instead of dull */
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%;}
+
+body{
+	margin:0;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* VS Code font stack */
+	color:var(--text);
+	-webkit-font-smoothing:antialiased;
+	-moz-osx-font-smoothing:grayscale;
+	/* Solid VS Code background - no image for better readability */
+	background-color: var(--bg);
+}
+
+/* Container utilities */
+.max-w-7xl{max-width:1100px;margin:0 auto}
+.mx-auto{margin-left:auto;margin-right:auto}
+.px-4{padding-left:1rem;padding-right:1rem}
+.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}
+.lg\:px-8{padding-left:2rem;padding-right:2rem}
+
+/* Typography */
+.text-2xl{font-size:1.5rem;line-height:1.25}
+.text-xl{font-size:1.25rem}
+.text-lg{font-size:1.125rem}
+.text-sm{font-size:0.875rem}
+.font-medium{font-weight:600}
+.font-semibold{font-weight:700}
+.mb-4{margin-bottom:1rem}
+.mt-2{margin-top:0.5rem}
+.mt-3{margin-top:0.75rem}
+.mt-4{margin-top:1rem}
+.mb-2{margin-bottom:0.5rem}
+.inline-block{display:inline-block}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+/* Firefox scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) rgba(255,255,255,0.1);
+}
+
+/* Hover-only Scrollbar */
+.hover-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hover-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hover-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.hover-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+}
+
+.hover-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.5) !important;
+}
+
+/* Firefox hover scrollbar */
+.hover-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.2s ease;
+}
+
+.hover-scrollbar:hover {
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+/* Grid */
+.grid{display:grid}
+.grid-cols-1{grid-template-columns:1fr}
+.gap-4{gap:1rem}
+.md\:grid-cols-3{grid-template-columns:repeat(1,1fr)}
+.md\:grid-cols-4{grid-template-columns:repeat(1,1fr)}
+@media (min-width:768px){
+	.md\:grid-cols-3{grid-template-columns:repeat(3,1fr)}
+	.md\:grid-cols-4{grid-template-columns:repeat(4,1fr)}
+	.md\:flex{display:flex}
+	/* ensure combined classes like "hidden md:flex" show at md+ widths */
+	.hidden.md\:flex{display:flex}
+	.md\:items-center{align-items:center}
+	.md\:space-x-8{gap:2rem}
+	/* same for hidden md:block used for auth area */
+	.hidden.md\:block{display:block}
+}
+
+/* Layout utilities */
+.flex{display:flex}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.h-16{height:4rem}
+.space-x-2{gap:0.5rem}
+.hidden{display:none}
+
+/* Cards and borders */
+.border{border:1px solid var(--border)}
+.rounded{border-radius:0.375rem} /* Slightly smaller radius like VS Code */
+.rounded-md{border-radius:0.25rem}
+.p-4{padding:1rem}
+.p-6{padding:1.5rem}
+.px-3{padding-left:0.75rem;padding-right:0.75rem}
+.py-2{padding-top:0.5rem;padding-bottom:0.5rem}
+.shadow-sm{box-shadow:0 2px 4px rgba(0,0,0,0.3)}
+.shadow-md{box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+.block{display:block}
+.transition{transition:all .2s ease} /* Slightly slower, like VS Code */
+.hover\:bg-blue-50:hover{background:var(--card-hover)}
+
+/* Clickable item cards used on videos/slides/articles/files pages */
+.item-card{background:var(--card);border:1px solid var(--border);padding:1rem;border-radius:0.375rem;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+.item-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.4);background:var(--card-hover);cursor:pointer}
+
+/* Colors */
+.bg-white{background:var(--surface)}
+.bg-gray-50{background:var(--card)}
+.bg-accent{background:var(--accent)}
+.bg-green-500{background:var(--success)}
+.text-white{color:var(--text-bright)} /* Bright white for headings */
+.text-gray-600{color:var(--muted)}
+.text-gray-700{color:var(--text)} /* Regular text color */
+.text-gray-800{color:var(--text)}
+.text-accent{color:var(--yellow)} /* Changed to yellow for consistency */
+.text-accent-strong{color:var(--yellow)}
+.text-red-600{color:var(--danger)}
+.border-gray-200{border-color:var(--border)}
+
+/* Consistent link styling - all links should be yellow */
+a {
+  color: var(--yellow);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--warning); /* Slightly more orange on hover */
+  text-decoration: none;
+}
+
+/* Buttons */
+.px-4{padding-left:1rem;padding-right:1rem}
+.py-2{padding-top:0.5rem;padding-bottom:0.5rem}
+.btn{display:inline-block;padding:.5rem 1rem;border-radius:.25rem;transition:all .2s ease}
+.btn-primary{background:var(--accent);color:white;border:1px solid var(--accent)}
+.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.disabled\:bg-gray-400:disabled{background:var(--muted);opacity:0.6}
+
+/* Secondary button for admin and subtle actions */
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--card-hover);border-color:var(--accent)}
+
+/* Inputs/dark form controls */
+.input-dark{background:var(--card);color:var(--text);border:1px solid var(--border);transition:border-color .2s ease}
+.input-dark:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.input-dark::placeholder{color:var(--muted)}
+.textarea-dark{background:var(--card);color:var(--text);border:1px solid var(--border);font-family: 'Consolas', 'Monaco', monospace}
+
+/* Navbar specifics */
+nav{background:rgba(23, 20, 27, 0.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);position:relative;z-index:100}
+
+/* Logo hover animation - simple scale like profile */
+nav .logo-container {
+  transition: all 0.3s ease;
+}
+nav .logo-container:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Brand name styling - plain yellow */
+.brand-name {
+  color: var(--yellow);
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  padding: 0.25rem 0;
+}
+
+/* Logo icon styling */
+.logo-icon {
+  transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  padding: 0.25rem;
+}
+
+nav .logo-container:hover .logo-icon {
+  transform: rotate(5deg) scale(1.3);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Navbar links with simple hover like profile */
+nav a, nav button{
+  color: #ffffff;
+  position:relative;
+  transition: all 0.3s ease;
+  border-radius: 0.375rem;
+  margin: 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+nav .navbar-link:hover{
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* General nav hover for other buttons */
+nav a:hover, nav button:hover{
+  color:var(--text-bright);
+}
+
+/* Active/current page indicator */
+nav a.active {
+  color: var(--accent);
+  background: var(--card);
+  border-bottom: 2px solid var(--accent);
+}
+
+/* Profile avatar hover effect */
+nav .profile-avatar {
+  transition: all 0.3s ease;
+  position: relative;
+}
+nav .profile-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Mobile navigation links */
+.mobile-nav-link {
+  transition: all 0.2s ease;
+}
+.mobile-nav-link:hover {
+  background: var(--card-hover);
+  transform: translateX(4px);
+}
+
+/* Max width for navigation container */
+nav .max-w-md {
+  max-width: 28rem;
+}
+
+/* Sign out button special styling */
+nav button[class*="sign-out"], nav button:last-child {
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+nav button[class*="sign-out"]:hover, nav button:last-child:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+} 
+
+/* Utility for prose content */
+.prose{color:var(--text);line-height:1.6}
+.prose a{color:var(--yellow);}
+
+/* Responsive helper for mobile */
+@media (max-width:767px){
+	.md\:flex{display:none}
+	
+	/* Mobile navbar adjustments */
+	nav .h-16 {
+		height: 4rem;
+	}
+}
+
+/* Tablet and larger screens */
+@media (min-width: 768px) and (max-width: 1024px) {
+	nav .max-w-md {
+		max-width: 24rem;
+	}
+	nav .space-x-6 > * + * {
+		margin-left: 1rem;
+	}
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+	nav .max-w-md {
+		max-width: 32rem;
+	}
+	nav .space-x-6 > * + * {
+		margin-left: 1.5rem;
+	}
+}
+
+/* Responsive card grid system */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Files grid - 1/3 layout with constraints */
+.files-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: flex-start;
+}
+
+.files-grid > * {
+  flex: 1 1 100%;
+  min-width: 320px;
+}
+
+/* Categories grid - 1/4 layout with constraints */
+.categories-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: flex-start;
+}
+
+.categories-grid > * {
+  flex: 1 1 100%;
+  min-width: 280px;
+}
+
+/* Individual card styling */
+.course-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  min-width: 280px;
+  box-shadow: 
+    0 2px 8px rgba(0,0,0,0.15),
+    0 1px 3px rgba(0,0,0,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--yellow), var(--accent));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.course-card:hover {
+  background: var(--card-hover);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 12px 32px rgba(0,0,0,0.3),
+    0 4px 12px rgba(0,0,0,0.2),
+    0 2px 4px rgba(0,0,0,0.1),
+    0 0 15px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.course-card:hover::before {
+  opacity: 0;
+}
+
+.course-card:active {
+  transform: translateY(-2px) scale(1.01);
+  transition: all 0.1s ease;
+}
+
+/* Custom card hover effects for CategoryList and FilesDocuments pages */
+.bg-white\/5 {
+  background: rgba(255, 255, 255, 0.03) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-white\/5:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 
+    0 8px 32px rgba(0,0,0,0.25),
+    0 4px 16px rgba(0,0,0,0.15),
+    0 0 20px rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-3px) scale(1.01);
+}
+
+/* Responsive grid breakpoints */
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  .course-card {
+    min-width: 300px;
+  }
+  
+  /* Files grid - 2 columns on tablet */
+  .files-grid > * {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+  
+  /* Categories grid - 2 columns on tablet */
+  .categories-grid > * {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+  .course-card {
+    min-width: 320px;
+  }
+  
+  /* Files grid responsive - maintains 1/3 but with better constraints */
+  .files-grid > * {
+    flex: 1 1 calc(33.333% - 1rem);
+  }
+  
+  /* Categories grid responsive - maintains 1/4 but with better constraints */
+  .categories-grid > * {
+    flex: 1 1 calc(25% - 1rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Link styling */
+a.no-underline {
+  text-decoration: none;
+}
+
+a.no-underline:hover {
+  text-decoration: none;
+}
+
+/* Vibrant text colors for variety */
+.text-accent-purple { color: var(--purple); }
+.text-accent-cyan { color: var(--cyan); }
+.text-accent-pink { color: var(--pink); }
+.text-accent-orange { color: var(--orange); }
+.text-accent-yellow { color: var(--yellow); }
+.text-yellow-500 { color: var(--yellow); } /* Alias for consistency */
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+
+/* Gradient text effects */
+.text-gradient-blue {
+  background: linear-gradient(135deg, var(--accent), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-warm {
+  background: linear-gradient(135deg, var(--warning), var(--orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Category badges/pills for visual interest */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge-blue { background: var(--accent); color: white; }
+.badge-green { background: var(--success); color: var(--bg); }
+.badge-orange { background: var(--warning); color: var(--bg); }
+.badge-purple { background: var(--purple); color: white; }
+.badge-cyan { background: var(--cyan); color: var(--bg); }
+.badge-pink { background: var(--pink); color: white; }
+
+/* Status indicators */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.status-online { background: var(--success); }
+.status-offline { background: var(--muted); }
+.status-busy { background: var(--danger); }
+.status-away { background: var(--warning); }
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-pulse { animation: pulse 2s infinite; }
+.animate-slide-in { animation: slideIn 0.3s ease-out; }
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+
+/* Interactive elements */
+.interactive:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+/* Small helpers */
+.text-center{text-align:center}
+

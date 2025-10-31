@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HTML → JSON Extractor</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      background: #f8fafc;
+      color: #111;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-family: monospace;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+      margin-top: 10px;
+    }
+    pre {
+      background: #1e293b;
+      color: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #16a34a;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    #toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <h2>HTML → JSON Extractor</h2>
+  <p>Paste your HTML snippet below and click <b>Extract & Copy JSON</b>.</p>
+
+  <textarea id="inputHtml"><div class="p-5 flex gap-2 flex-col"><div class="border p-5 rounded-lg shadow-sm flex-wrap"><a href="/backend-media/papers/BITS%20F464/2017/First/BITS_F464_1339_C_2017_1.pdf" target="_blank" rel="noreferrer" class="grid grid-rows-2"><div class="font-bold">Comprehensive - 2017 First Semester</div><div>(BITS F464) Machine Learning Pilani</div></a></div></div></textarea>
+
+  <div>
+    <button id="extractBtn">Extract & Copy JSON</button>
+  </div>
+
+  <pre id="output">No data extracted yet.</pre>
+
+  <div id="toast">✅ JSON copied to clipboard!</div>
+
+  <script>
+    const BASE = "https://library.bits-pilani.ac.in";
+
+    function cleanName(text) {
+      return text.replace(/\s+/g, ' ').replace(/<!--.*?-->/g, '').trim();
+    }
+
+    function makeAbsolute(url) {
+      if (!url) return "";
+      if (/^https?:\/\//i.test(url)) return url;
+      return BASE.replace(/\/+$/, '') + '/' + url.replace(/^\/+/, '');
+    }
+
+    document.getElementById('extractBtn').onclick = async () => {
+      const html = document.getElementById('inputHtml').value;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const links = doc.querySelectorAll('a[href]');
+      const data = Array.from(links).map(a => {
+        const bold = a.querySelector('.font-bold');
+        const name = cleanName(bold ? bold.textContent : a.textContent);
+        const url = makeAbsolute(a.getAttribute('href'));
+        return { name, url };
+      });
+
+      const json = JSON.stringify(data, null, 2);
+      document.getElementById('output').textContent = json;
+      await navigator.clipboard.writeText(json);
+
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    };
+  </script>
+</body>
+</html>
