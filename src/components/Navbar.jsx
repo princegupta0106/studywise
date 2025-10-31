@@ -51,7 +51,7 @@ const Navbar = () => {
               <span className="font-bold text-lg brand-name">StudyWise</span>
             </Link>
           </div>
-git config --global user.email princeguptapg0106@gmail          <div className="hidden md:flex md:flex-1 md:justify-center">
+        <div className="hidden md:flex md:flex-1 md:justify-center">
             <div className="flex space-x-2 lg:space-x-8 max-w-2xl">
               <Link to="/" className="font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap">Home</Link>
               <Link to="/links" className="font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap">Links</Link>
