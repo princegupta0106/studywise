@@ -109,11 +109,10 @@ export default function FilesDocuments() {
       ) : (
         <div className="space-y-4">
           {folderItems.map((folder, index) => (
-            <div key={index} className="bg-white/5 rounded-lg border border-transparent overflow-hidden">
-              {/* Folder Header */}
+            <div key={index} className=" rounded-lg border border-transparent overflow-hidden">
               <button
                 onClick={() => handleFolderClick(folder.folder_name)}
-                className="w-full px-6 py-4 text-left hover:bg-white/10 transition-all duration-200 flex items-center justify-between"
+                className="w-full px-6 py-4 text-left hover:bg-gray-700/10 transition-all duration-200 flex items-center justify-between"
               >
                 <div className="flex items-center">
                   <div className="mr-3">
@@ -161,7 +160,7 @@ export default function FilesDocuments() {
                           href={file.file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block bg-white/5 hover:bg-white/15 rounded-lg p-4 transition-all duration-200 border border-white/10 hover:border-white/20 shadow-sm hover:shadow-md transform hover:scale-105"
+                          className="block bg-white/5 hover:bg-white/15 rounded-lg p-4 transition-all duration-200 border border-white/10 hover:border-white/10   transform hover:scale-102"
                         >
                           <div className="flex items-start">
                             <div className="mr-3 mt-1">

@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UL Href Bulk Downloader</title>
+    <style>
+      body { font-family: Arial, sans-serif; width:320px; margin:10px; }
+      button { margin:6px 0; padding:8px 10px; }
+      #links { max-height:240px; overflow:auto; border:1px solid #ddd; padding:6px; }
+      .link-item { font-size:0.9em; margin:4px 0; }
+      .filename { font-weight:600; }
+      .small { color:#666; font-size:0.8em; }
+    </style>
+  </head>
+  <body>
+    <h3>Bulk downloader</h3>
+    <div>
+      <label for="folderName">Folder name:</label>
+      <input type="text" id="folderName" placeholder="Enter folder name..." style="width:100%; margin:4px 0; padding:4px;">
+      <button id="downloadBtn" disabled>Download all to folder</button>
+    </div>
+    <div id="status" class="small">Auto-collecting links...</div>
+    <div id="links"></div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

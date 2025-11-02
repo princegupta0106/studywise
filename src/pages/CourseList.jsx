@@ -103,7 +103,7 @@ export default function CourseList() {
             <Link 
               key={category} 
               to={linkTo} 
-              className="block bg-white/5 hover:bg-white/10 rounded p-4 transition-all duration-200 border border-transparent w-[360px] shadow-lg shadow-black/20"
+              className="block bg-white/5 hover:bg-white/10 rounded p-4 border border-transparent w-[360px]"
             >
               <h3 className="font-medium text-lg mb-2 truncate" style={{color: 'var(--text-bright)'}}>{info.displayName}</h3>
               <p className="text-gray-400 text-sm mb-3 line-clamp-2">

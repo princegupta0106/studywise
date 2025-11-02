@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "UL Href Bulk Downloader",
+  "version": "1.0",
+  "description": "Collects all hrefs inside ULs with ResourceList class and downloads them in bulk.",
+  "permissions": ["downloads","activeTab","scripting"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

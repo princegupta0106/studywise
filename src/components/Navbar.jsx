@@ -45,7 +45,7 @@ const Navbar = () => {
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex items-center h-16">
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center space-x-3 logo-container">
+            <Link to="/" className="flex items-center space-x-3 logo-container transform transition-transform duration-300 ease-linear hover:scale-105">
               <Logo />
               <span className="font-bold text-lg brand-name">StudyWise</span>
             </Link>

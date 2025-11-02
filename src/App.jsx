@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 
-import './App.css'
+
 import Home from './pages/Home'
 import Buy from './pages/Buy'
 import CourseList from './pages/CourseList'
