@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Library Downloader</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:12px;width:360px}
+    input,textarea,button{box-sizing:border-box}
+    input,textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;margin-bottom:8px}
+    textarea{height:160px;font-family:monospace;white-space:pre-wrap;overflow:auto}
+    button{width:100%;padding:10px;border:none;border-radius:6px;background:#0ea5e9;color:#fff;cursor:pointer;margin-bottom:8px}
+    #status{font-size:13px;color:#222;min-height:20px}
+    .secondary{background:#334155}
+    .row{display:flex;gap:8px}
+    .row button{flex:1}
+  </style>
+</head>
+<body>
+  <h3>Library Downloader</h3>
+
+  <input id="folder" placeholder="Folder name (e.g. CHE_F212)" />
+  <div class="row">
+    <button id="extractBtn">Extract JSON</button>
+    <button id="downloadAll" class="secondary">Download All</button>
+  </div>
+
+  <button id="copyBtn">Copy JSON</button>
+
+  <textarea id="output" placeholder="Extracted JSON will appear here...">No data extracted yet.</textarea>
+  <div id="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

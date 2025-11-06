@@ -1,7 +1,7 @@
     /* src/index.css or src/style.css */
     @import 'tailwindcss';
 :root{
-  margin-top: 10px;
+  /* margin-top: 10px; */
 	/* VS Code inspired theme - easier on the eyes */
 	--bg: #141217; /* VS Code dark background */
 	--surface: hwb(270 10% 88%); /* VS Code sidebar/panel background */
@@ -29,14 +29,21 @@
 *{box-sizing:border-box}
 html,body,#root{height:100%;}
 
+
+ 
 body{
 	margin:0;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* VS Code font stack */
+	/* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; VS Code font stack */
 	color:var(--text);
 	-webkit-font-smoothing:antialiased;
 	-moz-osx-font-smoothing:grayscale;
 	/* Solid VS Code background - no image for better readability */
 	background-color: var(--bg);
+   font-family: "Geist", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+
 }
 
 /* Container utilities */

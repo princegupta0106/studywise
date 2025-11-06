@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Library Downloader",
+  "version": "1.2",
+  "description": "Extract PDF links and download them in bulk when the extension is activated.",
+  "permissions": [
+    "downloads",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {}
+}
