@@ -97,9 +97,9 @@ export default function FilesDocuments() {
       
       <div className="mb-8">
         <h2 className="text-2xl font-semibold mb-2" style={{color: '#c7c7c7'}}>Files & Documents</h2>
-        <p className="text-gray-400 text-lg">
+        {/* <p className="text-gray-400 text-lg">
           {folderItems.length} folder{folderItems.length !== 1 ? 's' : ''} • {totalFiles} file{totalFiles !== 1 ? 's' : ''}
-        </p>
+        </p> */}
       </div>
 
       {folderItems.length === 0 ? (

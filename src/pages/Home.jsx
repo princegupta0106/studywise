@@ -123,12 +123,13 @@ export default function Home() {
         }
       }
       
-      // CRITICAL: Clear user cache and reload data
+      // Clear user cache for future requests
       const { invalidateUserEnrollmentCache } = await import('../utils/localCache')
       invalidateUserEnrollmentCache(user.uid)
       
-      // Reload all data with fresh user information
-      await loadHomeData(true)
+      // Clear search results and search bar
+      setSearchQuery('')
+      setSearchResults([])
       
     } catch (e) {
       alert('Failed to update enrollment: ' + e.message)
@@ -152,13 +153,13 @@ export default function Home() {
     <div>
       {/* Search Section */}
       <div className="mb-8">
-        <div className="relative">
+        <div className="relative mx-auto" style={{maxWidth: '1200px'}}>
           <input
             type="text"
             placeholder="Search courses to enroll..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 rounded input-dark text-lg"
+            className="w-full p-3 rounded-lg input-dark text-base"
           />
           <svg className="absolute right-3 top-3 h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -211,21 +212,19 @@ export default function Home() {
 
       {/* Your Enrolled Courses */}
       <div>
-        <h3 className="text-xl font-semibold mb-4 text-white">
-          Your Courses
-        </h3>
+        
         {courses.length === 0 ? (
           <div>
             <p>You are not enrolled in any courses yet.</p>
             <p className="text-sm text-gray-600 mt-2">Use the search above to find and enroll in courses, or <Link to="/buy" className="text-accent">browse all courses</Link>.</p>
           </div>
         ) : (
-          <div className="card-grid">
+          <div className="card-grid ">
             {courses.map((c) => (
               <Link
                 key={c.id}
                 to={`/course/${c.id}`}
-                className="course-card no-underline"
+                className="course-card no-underline "
               >
                 <h4 className="font-medium text-lg mb-3" style={{color: '#c7c7c7'}}>{c.name || c.title || 'Untitled course'}</h4>
                 <p className="text-gray-600 text-sm mb-4 flex-grow">{c.description || 'No description available'}</p>
