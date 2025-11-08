@@ -112,22 +112,23 @@ export default function Buy() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-4 text-white">
-        Browse Courses
-      </h2>
+      <div className="max-w-7xl mx-auto px-4">
+        <h2 className="text-2xl font-semibold mb-4 text-white">
+          Browse Courses
+        </h2>
 
-      <div className="mb-4">
-        <label htmlFor="course-search" className="sr-only">Search courses</label>
-        <input
-          id="course-search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search courses by title or description..."
-          className="w-full p-3 rounded input-dark text-lg"
-        />
-      </div>
+        <div className="mb-4" style={{ maxWidth: '100%' }}>
+          <label htmlFor="course-search" className="sr-only">Search courses</label>
+          <input
+            id="course-search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search courses by title or description..."
+            className="w-full p-3 rounded input-dark text-lg"
+          />
+        </div>
 
-      <div className="card-grid">
+        <div className="card-grid">
         {courses
           .filter(c => {
             if (!search) return true
@@ -165,8 +166,9 @@ export default function Buy() {
           </div>
         ))}
       </div>
+  </div>
 
-      {!user && <div className="mt-4 text-red-600">Sign in to enroll in a course.</div>}
+  {!user && <div className="mt-4 text-red-600">Sign in to enroll in a course.</div>}
 
       {/* Confirmation Modal */}
       <ConfirmationModal
