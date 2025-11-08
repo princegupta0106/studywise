@@ -11,6 +11,9 @@ import AdminPage from './pages/AdminPage'
 import CategoryList from './pages/CategoryList'
 import FilesDocuments from './pages/FilesDocuments'
 import Chat from './pages/Chat'
+import GroupChatNew from './pages/GroupChatNew'
+import GroupChatList from './pages/GroupChatList'
+import GroupChatView from './pages/GroupChatView'
 import Links from './pages/Links'
 import Navbar from './components/Navbar'
 import CacheDebugger from './components/CacheDebugger'
@@ -28,6 +31,9 @@ function App() {
           <Route path="/course/:courseId/category/:category" element={<CategoryList />} />
           <Route path="/course/:courseId/files" element={<FilesDocuments />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/group-chat" element={<GroupChatNew />} />
+          <Route path="/group-chats" element={<GroupChatList />} />
+          <Route path="/group-chat/:gcId" element={<GroupChatView />} />
           <Route path="/links" element={<Links />} />
           <Route path="/seed" element={<SeedPage />} />
           <Route path="/admin" element={<AdminPage />} />

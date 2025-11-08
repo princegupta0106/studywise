@@ -70,8 +70,10 @@ body{
 
 /* Ensure navbar logo is large */
 .logo-icon {
-  width: 60px !important;
-  height: 60px !important;
+  width: 40px !important;
+  height: 40px !important;
+  translate: y(-3px);
+
   display: inline-block;
 }
 

@@ -63,7 +63,7 @@ const Navbar = () => {
             <div className="flex space-x-2 lg:space-x-8 max-w-2xl">
               <Link to="/" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/') ? 'bg-white/10 text-white' : ''}`}>Home</Link>
               <Link to="/links" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/links') ? 'bg-white/10 text-white' : ''}`}>Links</Link>
-              <Link to="/chat" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/chat') ? 'bg-white/10 text-white' : ''}`}>Chat</Link>
+              <Link to="/group-chats" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/group-chats') ? 'bg-white/10 text-white' : ''}`}>Chat</Link>
               {isInCourse && (
                 <span className="font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap bg-white/10 text-white">Course</span>
               )}
@@ -75,23 +75,23 @@ const Navbar = () => {
         <div className="mobile-nav-icons flex-1 justify-center">
           <div className="flex space-x-4">
             <Link to="/" className={`p-2 rounded ${isActiveLink('/') ? 'bg-white/10' : ''}`}>
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <svg width="30" height="30" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
               </svg>
             </Link>
             <Link to="/links" className={`p-2 rounded ${isActiveLink('/links') ? 'bg-white/10' : ''}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg width="30" height="30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
               </svg>
             </Link>
-            <Link to="/chat" className={`p-2 rounded ${isActiveLink('/chat') ? 'bg-white/10' : ''}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link to="/group-chats" className={`p-2 rounded ${isActiveLink('/group-chats') ? 'bg-white/10' : ''}`}>
+              <svg width="30" height="30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </Link>
             {isInCourse && (
               <span className="p-2 rounded bg-white/10">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="30" height="30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                 </svg>
