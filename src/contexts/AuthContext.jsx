@@ -7,7 +7,6 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [shouldAutoSignIn, setShouldAutoSignIn] = useState(false)
 
   const signInWithGoogle = async () => {
     try {
@@ -30,9 +29,7 @@ export function AuthProvider({ children }) {
       setUser(u)
       setLoading(false)
       
-      if (!u) {
-        setShouldAutoSignIn(true)
-      }
+      // no-op when there's no user; signing in is handled by the app routes/sign-in page
     })
     
     return () => {
@@ -42,24 +39,7 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  // Auto sign-in after first user interaction
-  useEffect(() => {
-    if (!shouldAutoSignIn || user || loading) return
-
-    const handleInteraction = () => {
-      console.log('User interaction detected, triggering sign-in...')
-      setShouldAutoSignIn(false)
-      signInWithGoogle()
-    }
-
-    document.addEventListener('click', handleInteraction, { once: true })
-    document.addEventListener('keydown', handleInteraction, { once: true })
-
-    return () => {
-      document.removeEventListener('click', handleInteraction)
-      document.removeEventListener('keydown', handleInteraction)
-    }
-  }, [shouldAutoSignIn, user, loading])
+  // NOTE: removed auto sign-in behavior. The app now redirects unauthenticated users to /signin.
 
   const signOut = async () => {
     setLoading(true)
