@@ -74,45 +74,55 @@ export default function ChatRoom({ gcId }) {
                   <div 
                     style={{
                       maxWidth: '70%',
-                      minWidth: '100px',
-                      backgroundColor: '#2563eb',
-                      color: 'white',
-                      padding: '10px 14px',
-                      borderRadius: '18px 18px 4px 18px',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                      wordWrap: 'break-word',
-                      overflowWrap: 'break-word',
-                      hyphens: 'auto',
+                      minWidth: '120px',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      overflow: 'hidden',
                       position: 'relative'
                     }}
                   >
-                    {/* Show user name at top of bubble */}
-                    <div style={{ 
-                      fontSize: '12px', 
-                      fontWeight: '600',
-                      opacity: 0.8,
-                      marginBottom: '4px',
-                      textTransform: 'capitalize'
+                    {/* Header frame with name and time */}
+                    <div style={{
+                      backgroundColor: '#1e40af', // Darker blue for header
+                      padding: '6px 12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      borderBottom: '1px solid rgba(255,255,255,0.1)'
                     }}>
-                      {displayName}
+                      <div style={{ 
+                        fontSize: '11px', 
+                        fontWeight: '600',
+                        color: '#e0e7ff',
+                        textTransform: 'capitalize',
+                        flex: 1
+                      }}>
+                        {displayName}
+                      </div>
+                      {time && (
+                        <div style={{ 
+                          fontSize: '10px', 
+                          color: '#cbd5e1',
+                          marginLeft: '8px'
+                        }}>
+                          {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      )}
                     </div>
                     
-                    <div style={{ 
-                      fontSize: '15px', 
+                    {/* Message content */}
+                    <div style={{
+                      backgroundColor: '#3b82f6', // Lighter blue for content
+                      color: 'white',
+                      padding: '10px 12px',
+                      fontSize: '14px', 
                       lineHeight: '1.4',
-                      marginBottom: time ? '4px' : '0'
+                      wordWrap: 'break-word',
+                      overflowWrap: 'break-word',
+                      hyphens: 'auto'
                     }}>
                       {m.text}
                     </div>
-                    {time && (
-                      <div style={{ 
-                        fontSize: '11px', 
-                        opacity: 0.7,
-                        textAlign: 'right'
-                      }}>
-                        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    )}
                   </div>
                 </div>
               )
