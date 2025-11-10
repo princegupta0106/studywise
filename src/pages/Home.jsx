@@ -175,28 +175,29 @@ export default function Home() {
             <div className="card-grid">
               {searchResults.map((course) => (
                 <div key={course.id} className="course-card">
-                  <h4 className="font-medium text-lg mb-3" style={{color: '#c7c7c7'}}>
-                    {course.name || course.title || 'Untitled Course'}
-                  </h4>
-                  <p className="text-gray-600 text-sm mb-4 flex-grow">{course.description || 'No description'}</p>
-                  <div className="flex flex-col gap-2">
+                  <div className="grow">
+                    <h4 className="font-medium text-base mb-4" style={{color: '#c7c7c7'}}>
+                      {course.name || course.title || 'Untitled Course'}
+                    </h4>
+                  </div>
+                  <div className="mt-auto flex flex-col gap-2 items-center">
                     {enrolled.includes(course.id) ? (
                       <>
-                        <Link to={`/course/${course.id}`} className="w-full px-4 py-2 text-sm text-center rounded font-medium transition-colors" style={{background: 'var(--accent)', color: 'white'}}>View Course</Link>
+                        <Link to={`/course/${course.id}`} className="max-w-[250px] w-full px-4 py-2 text-sm text-center rounded font-medium transition-colors" style={{background: 'var(--accent)', color: 'white'}}>View Course</Link>
                         <button
                           onClick={() => handleEnrollClick(course.id, course.name || course.title)}
                           disabled={enrolling === course.id}
-                          className="w-full px-4 py-2 text-sm rounded font-medium transition-colors"
+                          className="max-w-[250px] w-full px-4 py-2 text-sm rounded font-medium transition-colors"
                           style={{background: 'var(--danger)', color: 'white'}}
                         >
-                          {enrolling === course.id ? 'Removing...' : 'Unenroll'}
+                          {enrolling === course.id ? 'Removing...' : 'Remove'}
                         </button>
                       </>
                     ) : (
                       <button
                         onClick={() => handleEnrollClick(course.id, course.name || course.title)}
                         disabled={enrolling === course.id}
-                        className="w-full px-4 py-2 text-sm rounded font-medium transition-colors"
+                        className="max-w-[250px] w-full px-4 py-2 text-sm rounded font-medium transition-colors"
                         style={{background: 'var(--warning)', color: 'var(--bg)'}}
                       >
                         {enrolling === course.id ? 'Enrolling...' : 'Enroll'}
@@ -221,15 +222,20 @@ export default function Home() {
         ) : (
           <div className="card-grid ">
             {courses.map((c) => (
-              <Link
-                key={c.id}
-                to={`/course/${c.id}`}
-                className="course-card no-underline "
-              >
-                <h4 className="font-medium text-lg mb-3" style={{color: '#c7c7c7'}}>{c.name || c.title || 'Untitled course'}</h4>
-                <p className="text-gray-600 text-sm mb-4 flex-grow">{c.description || 'No description available'}</p>
-                <span className="text-sm font-medium" style={{color: 'var(--yellow)'}}>View course →</span>
-              </Link>
+              <div key={c.id} className="course-card">
+                <div className="grow">
+                  <h4 className="font-medium text-base mb-4" style={{color: '#c7c7c7'}}>{c.name || c.title || 'Untitled course'}</h4>
+                </div>
+                <div className="mt-auto">
+                  <Link 
+                    to={`/course/${c.id}`}
+                    className="text-xs font-medium" 
+                    style={{color: 'var(--yellow)'}}
+                  >
+                    View course →
+                  </Link>
+                </div>
+              </div>
             ))}
           </div>
         )}

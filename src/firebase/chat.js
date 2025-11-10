@@ -39,25 +39,27 @@ export async function createGcIfMissingForCourse(courseId) {
   return await createGcForCourse(courseId)
 }
 
-export async function sendGcMessage(gcId, { uid, email, text }) {
+export async function sendGcMessage(gcId, { email, name, text, createdAt }) {
   if (!gcId) throw new Error('gcId required')
   const chatRef = doc(db, 'gcs', gcId)
-  // Use arrayUnion to append message object to messages array
-  // serverTimestamp() cannot be used inside arrays (Firestore limitation).
-  // Use client-side ISO timestamp for the message and set a separate server-side
-  // `lastUpdated` field on the document so we have an authoritative server time.
-  const nowIso = new Date().toISOString()
+  
+  // Simplified message structure: only email, name, text, and timestamp
   const message = {
-    uid: uid || null,
     email: email || null,
+    name: name || 'Anonymous',
     text: text || '',
-    createdAt: nowIso
+    createdAt: createdAt || new Date().toISOString()
   }
 
   // Ensure the document exists; if not, create it with the initial message.
   const snap = await getDoc(chatRef)
   if (!snap.exists()) {
-    await setDoc(chatRef, { courseId: null, createdAt: serverTimestamp(), messages: [message], lastUpdated: serverTimestamp() })
+    await setDoc(chatRef, { 
+      courseId: null, 
+      createdAt: serverTimestamp(), 
+      messages: [message], 
+      lastUpdated: serverTimestamp() 
+    })
     return true
   }
 

@@ -34,8 +34,9 @@ export default function GroupChatView() {
   }, [gcId, courseName])
 
   return (
-    // Make the view fill most of the viewport so the chat can use available vertical space
-    <div className="max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column' }}>
+  // Make the view fill most of the viewport so the chat can use available vertical space
+  // overflow hidden ensures the page doesn't scroll and the inner messages list handles scrolling
+  <div className="max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div className="flex items-center gap-3 px-3 py-2 border-b border-white/5">
         <Link to="/group-chats" className="flex items-center gap-2 p-1 rounded hover:bg-white/5">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -48,7 +49,8 @@ export default function GroupChatView() {
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div className="p-2" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* minHeight: 0 is required so the flex child can shrink and allow the inner overflow-y auto to work */}
+        <div className="p-2" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <ChatRoom gcId={gcId} />
         </div>
       </div>

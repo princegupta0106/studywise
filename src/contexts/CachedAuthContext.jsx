@@ -50,9 +50,9 @@ export function CachedAuthProvider({ children }) {
     loadCachedCourses()
   }, [])
 
-  // Update cache when real user data arrives
+  // Update cache when real user data arrives - PREVENT DUPLICATE CALLS
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !loading && (!cachedUser || cachedUser.uid !== user.uid)) {
       const userToCache = {
         uid: user.uid,
         email: user.email,
@@ -64,7 +64,7 @@ export function CachedAuthProvider({ children }) {
       setCachedUser(userToCache)
       console.log('💾 User cached locally:', user.email)
     }
-  }, [user, loading])
+  }, [user, loading, cachedUser])
 
   // Listen for online/offline status
   useEffect(() => {

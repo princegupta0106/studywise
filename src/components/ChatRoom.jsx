@@ -2,24 +2,10 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useCachedAuth } from '../contexts/CachedAuthContext'
 import { subscribeToGcMessages, sendGcMessage } from '../firebase/chat'
 
-function initialsFromEmail(email) {
-  if (!email) return 'U'
-  const name = (email.split('@')[0] || '')
-  return name.split(/[._\-\s]+/).map(s => s[0] || '').slice(0,2).join('').toUpperCase() || 'U'
-}
-
-function colorFromString(str) {
-  let h = 0
-  for (let i = 0; i < str.length; i++) h = (h << 5) - h + str.charCodeAt(i)
-  const hue = Math.abs(h) % 360
-  return `hsl(${hue} 60% 45%)`
-}
-
 export default function ChatRoom({ gcId }) {
   const { user } = useCachedAuth() || {}
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
-  const listRef = useRef(null)
   const endRef = useRef(null)
 
   useEffect(() => {
@@ -32,8 +18,9 @@ export default function ChatRoom({ gcId }) {
   }, [gcId])
 
   useEffect(() => {
-    // scroll smoothly to bottom when messages change
-    if (endRef.current) endRef.current.scrollIntoView({ behavior: 'smooth' })
+    if (endRef.current) {
+      endRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [messages])
 
   const handleSend = async () => {
@@ -41,14 +28,22 @@ export default function ChatRoom({ gcId }) {
     if (!text) return
     setInput('')
     try {
-      await sendGcMessage(gcId, { uid: user?.uid, email: user?.email, text })
+      // Extract user name from display name or email
+      const userName = user?.displayName || 
+                      (user?.email ? user.email.split('@')[0].replace(/[._-]/g, ' ') : 'Anonymous')
+      
+      await sendGcMessage(gcId, { 
+        email: user?.email, 
+        name: userName,
+        text,
+        createdAt: new Date().toISOString()
+      })
     } catch (err) {
       console.error('send message failed', err)
     }
   }
 
   const parseTime = (m) => {
-    // m.createdAt may be Firestore Timestamp, a string, or Date
     try {
       if (!m) return ''
       const t = m.createdAt
@@ -61,55 +56,101 @@ export default function ChatRoom({ gcId }) {
   }
 
   return (
-    // root is a column so messages area can grow and input stays at bottom
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3 hover-scrollbar bg-transparent">
-        {messages.length === 0 ? (
-          <div className="text-center text-gray-400 mt-8">No messages yet</div>
-        ) : (
-          messages.map((m, i) => {
-            const isUser = user && (m.uid === user.uid || m.email === user.email)
-            const time = parseTime(m)
-            return (
-              <div key={m.id || i} className={`flex items-end ${isUser ? 'justify-end' : 'justify-start'}`}>
-                {!isUser && (
-                  <div className="mr-3" aria-hidden>
-                    <div style={{ width: 36, height: 36, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: colorFromString(m.email || m.uid), color: 'white', fontWeight: 700 }}>
-                      {initialsFromEmail(m.email || m.uid)}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#0f172a' }}>
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ minHeight: 0 }}>
+        <div className="max-w-4xl mx-auto">
+          {messages.length === 0 ? (
+            <div className="text-center text-gray-400 mt-8">Start the conversation</div>
+          ) : (
+            messages.map((m, i) => {
+              const time = parseTime(m)
+              // Extract display name from message or fallback to email processing
+              const displayName = m.name || 
+                                 (m.email ? m.email.split('@')[0].replace(/[._-]/g, ' ') : 'Anonymous')
+              
+              return (
+                <div key={m.id || i} className="mb-3 flex justify-end">
+                  <div 
+                    style={{
+                      maxWidth: '70%',
+                      minWidth: '100px',
+                      backgroundColor: '#2563eb',
+                      color: 'white',
+                      padding: '10px 14px',
+                      borderRadius: '18px 18px 4px 18px',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                      wordWrap: 'break-word',
+                      overflowWrap: 'break-word',
+                      hyphens: 'auto',
+                      position: 'relative'
+                    }}
+                  >
+                    {/* Show user name at top of bubble */}
+                    <div style={{ 
+                      fontSize: '12px', 
+                      fontWeight: '600',
+                      opacity: 0.8,
+                      marginBottom: '4px',
+                      textTransform: 'capitalize'
+                    }}>
+                      {displayName}
                     </div>
-                  </div>
-                )}
-
-                <div>
-                  <div className={`px-3 py-2 rounded-lg text-sm ${isUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`} style={{ maxWidth: '70vw' }}>
-                    <div>{m.text}</div>
-                    <div className="text-xs mt-1 opacity-70 text-right">{time ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</div>
+                    
+                    <div style={{ 
+                      fontSize: '15px', 
+                      lineHeight: '1.4',
+                      marginBottom: time ? '4px' : '0'
+                    }}>
+                      {m.text}
+                    </div>
+                    {time && (
+                      <div style={{ 
+                        fontSize: '11px', 
+                        opacity: 0.7,
+                        textAlign: 'right'
+                      }}>
+                        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {isUser && (
-                  <div className="ml-3" aria-hidden>
-                    <div style={{ width: 28 }} />
-                  </div>
-                )}
-              </div>
-            )
-          })
-        )}
-        <div ref={endRef} />
+              )
+            })
+          )}
+          <div ref={endRef} />
+        </div>
       </div>
 
-      <div className="px-3 py-2 border-t border-white/5 bg-transparent">
-        <form onSubmit={(e) => { e.preventDefault(); handleSend() }} className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 p-2 rounded border input-dark text-sm"
-          />
-          <button type="submit" className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Send</button>
-        </form>
+      {/* Input area */}
+      <div 
+        className="px-4 py-3"
+        style={{ 
+          backgroundColor: '#1e293b',
+          borderTop: '1px solid rgba(255,255,255,0.05)'
+        }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <form onSubmit={(e) => { e.preventDefault(); handleSend() }} className="flex items-center gap-3">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 px-4 py-3 rounded-full bg-gray-700 text-white placeholder-gray-400 border-none outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ fontSize: '15px' }}
+            />
+            <button 
+              type="submit" 
+              className="w-12 h-12 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center transition-colors"
+              style={{ minWidth: '48px' }}
+            >
+              <svg width="20" height="20" fill="white" viewBox="0 0 24 24">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )

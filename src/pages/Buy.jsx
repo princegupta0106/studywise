@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getCourseList, getUserById } from '../firebase/api'
 import { useCachedAuth } from '../contexts/CachedAuthContext'
 import { doc, setDoc, arrayUnion, updateDoc, arrayRemove } from 'firebase/firestore'
@@ -76,28 +77,33 @@ export default function Buy() {
     
     try {
       const userRef = doc(db, 'users', user.uid)
+      
+      // Update Firebase
       if (action === 'unenroll') {
-        // Unenroll
         await updateDoc(userRef, { courses: arrayRemove(courseId) })
+      } else {
+        await setDoc(userRef, { courses: arrayUnion(courseId) }, { merge: true })
+      }
+      
+      // IMMEDIATE UI UPDATE - don't wait for cache refresh
+      if (action === 'unenroll') {
         setEnrolled(prev => prev.filter(id => id !== courseId))
       } else {
-        // Enroll
-        await setDoc(userRef, { courses: arrayUnion(courseId) }, { merge: true })
         setEnrolled(prev => [...prev, courseId])
       }
       
-      // CRITICAL: Clear user cache and force fresh data  
+      // Clear user cache in background for future calls
       const { invalidateUserEnrollmentCache } = await import('../utils/localCache')
       invalidateUserEnrollmentCache(user.uid)
       
-      // Force refresh user data to get updated course list
-      const { getUserById } = await import('../firebase/api')
-      const freshUserData = await getUserById(user.uid, true) // Force refresh
-      const updatedCourseIds = freshUserData?.courses || []
-      setEnrolled(updatedCourseIds)
-      
     } catch (e) {
       alert('Failed to update enrollment: ' + e.message)
+      // Revert UI change on error
+      if (action === 'unenroll') {
+        setEnrolled(prev => [...prev, courseId])
+      } else {
+        setEnrolled(prev => prev.filter(id => id !== courseId))
+      }
     } finally {
       setEnrolling('')
       setConfirmModal({ isOpen: false, courseId: null, courseName: '', action: '' })
@@ -144,23 +150,31 @@ export default function Buy() {
           })
           .map(course => (
           <div key={course.id} className="course-card">
-            <div className="flex-grow">
-              <h3 className="font-medium text-lg mb-3" style={{color: '#c7c7c7'}}>
+            <div className="grow">
+              <h3 className="font-medium text-base mb-4" style={{color: '#c7c7c7'}}>
                 {course.name || course.title}
               </h3>
-              {course.description && <p className="text-gray-600 text-sm mb-4">{course.description}</p>}
             </div>
-            <div className="mt-auto">
+            <div className="mt-auto space-y-2 flex flex-col items-center">
+              {/* View Course Button */}
+              <Link 
+                to={`/course/${course.id}`}
+                className="max-w-[250px] w-full px-3 py-2 rounded border-2 border-blue-600 text-blue-300 hover:bg-blue-600 hover:text-white transition-all duration-200 text-center text-sm font-medium block"
+              >
+                View Course
+              </Link>
+              
+              {/* Enroll/Remove Button */}
               <button
-                className="w-full px-4 py-2 rounded font-medium transition-all duration-200"
-                style={{
-                  background: enrolled.includes(course.id) ? 'var(--danger)' : 'var(--warning)',
-                  color: enrolled.includes(course.id) ? 'white' : 'var(--bg)'
-                }}
+                className={`max-w-[250px] w-full px-3 py-2 rounded border-2 text-sm font-medium transition-all duration-200 ${
+                  enrolled.includes(course.id) 
+                    ? 'border-red-600 text-red-300 hover:bg-red-600 hover:text-white' 
+                    : 'border-green-600 text-green-300 hover:bg-green-600 hover:text-white'
+                }`}
                 disabled={!user || enrolling === course.id}
                 onClick={() => handleEnrollClick(course.id, course.name || course.title)}
               >
-                {enrolling === course.id ? 'Updating...' : (enrolled.includes(course.id) ? 'Unenroll' : 'Enroll')}
+                {enrolling === course.id ? 'Updating...' : (enrolled.includes(course.id) ? 'Remove' : 'Enroll')}
               </button>
             </div>
           </div>

@@ -14,6 +14,7 @@
 	--accent: #007acc; /* VS Code blue accent */
 	--accent-600: #005a9e;
 	--accent-hover: #1177bb;
+  --accent-shadow: 73 139 255; /* RGB for soft blue glow (use with alpha) */
 	--success: #89d185; /* VS Code green */
 	--warning: #2F80ED; /* VS Code orange/amber */
 	--danger: #f53e3e; /* VS Code red */
@@ -221,6 +222,7 @@ a:hover {
 .btn{display:inline-block;padding:.5rem 1rem;border-radius:.25rem;transition:all .2s ease}
 .btn-primary{background:var(--accent);color:white;border:1px solid var(--accent)}
 .btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn-primary{box-shadow: 0 6px 18px rgba(var(--accent-shadow), 0.055)}
 .disabled\:bg-gray-400:disabled{background:var(--muted);opacity:0.6}
 
 /* Secondary button for admin and subtle actions */
@@ -406,7 +408,7 @@ nav button[class*="sign-out"]:hover, nav button:last-child:hover {
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  min-height: 200px;
+  min-height: 130px;
   min-width: 280px;
   box-shadow: 
     0 2px 8px rgba(0,0,0,0.15),
@@ -436,7 +438,9 @@ nav button[class*="sign-out"]:hover, nav button:last-child:hover {
     0 4px 4px rgba(0,0,0,0.2),
     0 2px 4px rgba(0,0,0,0.1),
     0 0 4px rgba(255, 255, 255, 0.08),
-    inset 0 1px 0 rgba(255,255,255,0.1);
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    /* subtle blue accent glow */
+    0 10px 30px rgba(var(--accent-shadow), 0.06);
 }
 
 .course-card:hover::before {
@@ -637,6 +641,11 @@ a.no-underline:hover {
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Small utility to apply a subtle blue accent glow */
+.accent-glow {
+  box-shadow: 0 8px 24px rgba(var(--accent-shadow), 0.05) !important;
 }
 
 @media (min-width: 1200px) {

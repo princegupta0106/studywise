@@ -18,16 +18,27 @@ const Links = () => {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
+  // Define subtle color variations - blue and purple tones only
+  const getColorClass = (index) => {
+    const colors = [
+      'bg-[rgba(59,130,246,0.08)] hover:bg-[rgba(59,130,246,0.15)] border border-blue-600/20', // Blue
+      'bg-[rgba(168,85,247,0.08)] hover:bg-[rgba(168,85,247,0.15)] border border-purple-600/20', // Purple
+      'bg-[rgba(99,102,241,0.08)] hover:bg-[rgba(99,102,241,0.15)] border border-indigo-600/20', // Indigo
+      'bg-[rgba(139,92,246,0.08)] hover:bg-[rgba(139,92,246,0.15)] border border-violet-600/20', // Violet
+    ]
+    return colors[index % colors.length]
+  }
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h2 className="text-2xl font-semibold mb-6">Important Links</h2>
       
       <div className="space-y-3">
-        {links.map((link) => (
+        {links.map((link, index) => (
           <button
             key={link.id}
             onClick={() => handleLinkClick(link.url)}
-            className="w-full h-8 px-4 bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] border border-gray-700 rounded text-left text-white text-sm font-medium transition-colors duration-200 flex items-center"
+            className={`w-full py-3 px-4 ${getColorClass(index)} rounded-sm text-left text-white text-sm font-medium transition-colors duration-200 flex items-center`}
           >
             {link.name}
           </button>

@@ -7,6 +7,53 @@ import {
   removeCachedCourse
 } from '../utils/localCache'
 
+// ========================================
+// REQUEST DEDUPLICATION & AGGRESSIVE CACHING
+// ========================================
+
+// Global request cache to prevent duplicate API calls
+const pendingRequests = new Map()
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+const requestCache = new Map()
+
+function deduplicateRequest(key, apiCall) {
+  // Check if we have a cached result that's still fresh
+  const cached = requestCache.get(key)
+  if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+    console.log(`🚀 Returning cached result for: ${key}`)
+    return Promise.resolve(cached.data)
+  }
+
+  // Check if request is already pending
+  if (pendingRequests.has(key)) {
+    console.log(`⏳ Deduplicating request for: ${key}`)
+    return pendingRequests.get(key)
+  }
+  
+  // Execute the API call
+  const promise = apiCall().then(result => {
+    // Cache the result
+    requestCache.set(key, {
+      data: result,
+      timestamp: Date.now()
+    })
+    console.log(`💾 Cached API result for: ${key}`)
+    return result
+  }).finally(() => {
+    pendingRequests.delete(key)
+  })
+  
+  pendingRequests.set(key, promise)
+  return promise
+}
+
+// Clear request cache when needed
+function clearRequestCache() {
+  requestCache.clear()
+  pendingRequests.clear()
+  console.log('🧹 Request cache cleared')
+}
+
 // Users: collection 'users' -> each doc id = uid, fields: name, courses: [courseId,...]
 // NEW STRUCTURE:
 // Courses: collection 'courses' -> auto-generated ID with:
@@ -25,81 +72,96 @@ export async function invalidateUserCache(uid) {
 }
 
 export async function getUserById(uid, forceRefresh = false) {
-  try {
-    // If force refresh requested, skip cache
-    if (!forceRefresh) {
-      // 1. Check localStorage first
-      const cachedUser = getCachedUser(uid)
-      if (cachedUser) {
-        return cachedUser
+  const cacheKey = `user:${uid}`
+  
+  return deduplicateRequest(cacheKey, async () => {
+    try {
+      // If force refresh requested, skip cache
+      if (!forceRefresh) {
+        // 1. Check localStorage first
+        const cachedUser = getCachedUser(uid)
+        if (cachedUser) {
+          console.log(`✅ User ${uid.slice(0,8)} loaded from localStorage`)
+          return cachedUser
+        }
       }
+      
+      // 2. Cache miss or force refresh - call API (THIS IS THE ONLY FIREBASE READ)
+      console.log(`🌐 Fetching user ${uid.slice(0,8)} from Firebase`)
+      const ref = doc(db, 'users', uid)
+      const snap = await getDoc(ref)
+      const userData = snap.exists() ? { id: snap.id, ...snap.data() } : null
+      
+      // 3. Put in localStorage
+      if (userData) {
+        setCachedUser(uid, userData)
+      }
+      
+      return userData
+    } catch (error) {
+      console.error('Error getting user by ID:', error)
+      return null
     }
-    
-    // 2. Cache miss or force refresh - call API
-    const ref = doc(db, 'users', uid)
-    const snap = await getDoc(ref)
-    const userData = snap.exists() ? { id: snap.id, ...snap.data() } : null
-    
-    // 3. Put in localStorage
-    if (userData) {
-      setCachedUser(uid, userData)
-    }
-    
-    // 4. Take from localStorage and return
-    return getCachedUser(uid) || userData
-  } catch (error) {
-    console.error('Error getting user by ID:', error)
-    return null
-  }
+  })
 }
 
 export async function listCourses() {
-  try {
-    // 1. Check localStorage first
-    const cachedCourseList = getCachedCourseList()
-    if (cachedCourseList) {
-      return cachedCourseList
+  const cacheKey = 'courses:list'
+  
+  return deduplicateRequest(cacheKey, async () => {
+    try {
+      // 1. Check localStorage first
+      const cachedCourseList = getCachedCourseList()
+      if (cachedCourseList) {
+        console.log('✅ Course list loaded from localStorage')
+        return cachedCourseList
+      }
+      
+      // 2. Cache miss - call API (THIS IS THE ONLY FIREBASE READ)
+      console.log('🌐 Fetching course list from Firebase')
+      const snap = await getDocs(collection(db, 'courses'))
+      const courses = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      
+      // 3. Put in localStorage
+      setCachedCourseList(courses)
+      
+      return courses
+    } catch (error) {
+      console.error('Error listing courses:', error)
+      return []
     }
-    
-    // 2. Cache miss - call API
-    const snap = await getDocs(collection(db, 'courses'))
-    const courses = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-    
-    // 3. Put in localStorage
-    setCachedCourseList(courses)
-    
-    // 4. Take from localStorage and return
-    return getCachedCourseList() || courses
-  } catch (error) {
-    console.error('Error listing courses:', error)
-    return []
-  }
+  })
 }
 
 export async function getCourse(courseId) {
-  try {
-    // 1. Check localStorage first
-    const cachedCourse = getCachedCourse(courseId)
-    if (cachedCourse) {
-      return cachedCourse
+  const cacheKey = `course:${courseId}`
+  
+  return deduplicateRequest(cacheKey, async () => {
+    try {
+      // 1. Check localStorage first
+      const cachedCourse = getCachedCourse(courseId)
+      if (cachedCourse) {
+        console.log(`✅ Course ${courseId.slice(0,8)} loaded from localStorage`)
+        return cachedCourse
+      }
+      
+      // 2. Cache miss - call API (THIS IS THE ONLY FIREBASE READ)
+      console.log(`🌐 Fetching course ${courseId.slice(0,8)} from Firebase`)
+      const ref = doc(db, 'courses', courseId)
+      const snap = await getDoc(ref)
+      const courseData = snap.exists() ? { id: snap.id, ...snap.data() } : null
+      
+      // 3. Put in localStorage
+      if (courseData) {
+        setCachedCourse(courseId, courseData)
+      }
+      
+      return courseData
+    } catch (error) {
+      console.error('Error getting course:', error)
+      return null
     }
-    
-    // 2. Cache miss - call API
-    const ref = doc(db, 'courses', courseId)
-    const snap = await getDoc(ref)
-    const courseData = snap.exists() ? { id: snap.id, ...snap.data() } : null
-    
-    // 3. Put in localStorage
-    if (courseData) {
-      setCachedCourse(courseId, courseData)
-    }
-    
-    // 4. Take from localStorage and return
-    return getCachedCourse(courseId) || courseData
-  } catch (error) {
-    console.error('Error getting course:', error)
-    return null
-  }
+  })
 }
 
 export async function getCourseItems(courseId) {
@@ -372,53 +434,59 @@ export async function updateCourseList() {
 }
 
 export async function getCourseList() {
-  try {
-    // 1. Check localStorage first
-    const cachedCourseList = getCachedCourseList()
-    if (cachedCourseList) {
-      // Return as map format expected by existing code
+  const cacheKey = 'courselist:all'
+  
+  return deduplicateRequest(cacheKey, async () => {
+    try {
+      // 1. Check localStorage first
+      const cachedCourseList = getCachedCourseList()
+      if (cachedCourseList) {
+        // Return as map format expected by existing code
+        const courseMap = {}
+        cachedCourseList.forEach(course => {
+          courseMap[course.id] = { name: course.name, description: course.description }
+        })
+        console.log('✅ Course list map loaded from localStorage')
+        return courseMap
+      }
+      
+      // 2. Cache miss - call API (SINGLE FIREBASE READ)
+      console.log('🌐 Fetching course list document from Firebase')
+      const courseListRef = doc(db, 'course-list', 'all-courses')
+      const courseListSnap = await getDoc(courseListRef)
+      
+      if (courseListSnap.exists()) {
+        const courseMap = courseListSnap.data().courses || {}
+        
+        // 3. Convert to array format and put in localStorage
+        const coursesArray = Object.entries(courseMap).map(([id, data]) => ({
+          id,
+          name: data.name,
+          description: data.description
+        }))
+        setCachedCourseList(coursesArray)
+        
+        // 4. Return the map format
+        return courseMap
+      } else {
+        // If document doesn't exist, create it (ONE-TIME ONLY)
+        console.log('Course list document not found, creating it...')
+        return await updateCourseList()
+      }
+    } catch (error) {
+      console.error('Error getting course list:', error)
+      // Fallback - but this should rarely happen
+      const courses = await listCourses()
       const courseMap = {}
-      cachedCourseList.forEach(course => {
-        courseMap[course.id] = { name: course.name, description: course.description }
+      courses.forEach(course => {
+        courseMap[course.id] = {
+          name: course.name || course.title || 'Untitled Course',
+          description: course.description || ''
+        }
       })
       return courseMap
     }
-    
-    // 2. Cache miss - call API
-    const courseListRef = doc(db, 'course-list', 'all-courses')
-    const courseListSnap = await getDoc(courseListRef)
-    
-    if (courseListSnap.exists()) {
-      const courseMap = courseListSnap.data().courses || {}
-      
-      // 3. Convert to array format and put in localStorage
-      const coursesArray = Object.entries(courseMap).map(([id, data]) => ({
-        id,
-        name: data.name,
-        description: data.description
-      }))
-      setCachedCourseList(coursesArray)
-      
-      // 4. Return the map format
-      return courseMap
-    } else {
-      // If document doesn't exist, create it
-      console.log('Course list document not found, creating it...')
-      return await updateCourseList()
-    }
-  } catch (error) {
-    console.error('Error getting course list:', error)
-    // Fallback to original method
-    const courses = await listCourses()
-    const courseMap = {}
-    courses.forEach(course => {
-      courseMap[course.id] = {
-        name: course.name || course.title || 'Untitled Course',
-        description: course.description || ''
-      }
-    })
-    return courseMap
-  }
+  })
 }
 
 // Pre-warming function for frequently accessed content - AGGRESSIVE CACHING
