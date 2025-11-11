@@ -38,7 +38,7 @@ export default function Buy() {
         // Step 2: Get user enrollment data (uses localStorage cache internally)
         let enrolledCourses = []
         if (user) {
-          const userDoc = await getUserById(user.uid)
+          const userDoc = await getUserById(user.email)
           enrolledCourses = userDoc?.courses || []
         }
         
@@ -76,7 +76,7 @@ export default function Buy() {
     setEnrolling(courseId)
     
     try {
-      const userRef = doc(db, 'users', user.uid)
+      const userRef = doc(db, 'users', user.email)
       
       // Update Firebase
       if (action === 'unenroll') {
@@ -94,7 +94,12 @@ export default function Buy() {
       
       // Clear user cache in background for future calls
       const { invalidateUserEnrollmentCache } = await import('../utils/localCache')
-      invalidateUserEnrollmentCache(user.uid)
+      invalidateUserEnrollmentCache(user.email)
+      
+      // Refresh the entire website to sync changes across all pages
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
       
     } catch (e) {
       alert('Failed to update enrollment: ' + e.message)

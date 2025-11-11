@@ -22,8 +22,8 @@ export default function GroupChatList() {
           setCourses([])
           return
         }
-        const userData = await getUserById(user.uid)
-        const enrolled = userData?.courses || []
+        const userData = await getUserById(user.email)
+        const enrolledCourses = userData?.courses || []
         const courseObjs = await Promise.all(enrolled.map(async id => {
           try { const c = await getCourse(id); return c ? { id, ...c } : null } catch(e){ return null }
         }))

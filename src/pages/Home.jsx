@@ -31,7 +31,7 @@ export default function Home() {
     
     try {
       // Step 1: Get user data (force refresh if needed)
-      const userData = await getUserById(user.uid, forceRefresh)
+      const userData = await getUserById(user.email, forceRefresh)
       const courseIds = userData?.courses || []
       setEnrolled(courseIds)
       
@@ -106,7 +106,7 @@ export default function Home() {
     setEnrolling(courseId)
     
     try {
-      const userRef = doc(db, 'users', user.uid)
+      const userRef = doc(db, 'users', user.email)
       if (action === 'unenroll') {
         // Unenroll
         await updateDoc(userRef, { courses: arrayRemove(courseId) })
@@ -125,11 +125,16 @@ export default function Home() {
       
       // Clear user cache for future requests
       const { invalidateUserEnrollmentCache } = await import('../utils/localCache')
-      invalidateUserEnrollmentCache(user.uid)
+      invalidateUserEnrollmentCache(user.email)
       
       // Clear search results and search bar
       setSearchQuery('')
       setSearchResults([])
+      
+      // Refresh the entire website to sync changes across all pages
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
       
     } catch (e) {
       alert('Failed to update enrollment: ' + e.message)

@@ -54,7 +54,8 @@ function clearRequestCache() {
   console.log('🧹 Request cache cleared')
 }
 
-// Users: collection 'users' -> each doc id = uid, fields: name, courses: [courseId,...]
+// Users: collection 'users' -> each doc id = email, fields: name, courses: [courseId,...]
+// Note: Email is used as document ID for easier access and management
 // NEW STRUCTURE:
 // Courses: collection 'courses' -> auto-generated ID with:
 //   {
@@ -71,35 +72,35 @@ export async function invalidateUserCache(uid) {
   console.log(`🗑️ User cache invalidated for: ${uid}`)
 }
 
-export async function getUserById(uid, forceRefresh = false) {
-  const cacheKey = `user:${uid}`
+// Get user by email (document ID) with aggressive caching
+export function getUserById(userEmail, forceRefresh = false) {
+  const cacheKey = `user:${userEmail}`
   
   return deduplicateRequest(cacheKey, async () => {
     try {
-      // If force refresh requested, skip cache
       if (!forceRefresh) {
         // 1. Check localStorage first
-        const cachedUser = getCachedUser(uid)
+        const cachedUser = getCachedUser(userEmail)
         if (cachedUser) {
-          console.log(`✅ User ${uid.slice(0,8)} loaded from localStorage`)
+          console.log(`✅ User ${userEmail} loaded from localStorage`)
           return cachedUser
         }
       }
       
       // 2. Cache miss or force refresh - call API (THIS IS THE ONLY FIREBASE READ)
-      console.log(`🌐 Fetching user ${uid.slice(0,8)} from Firebase`)
-      const ref = doc(db, 'users', uid)
+      console.log(`🌐 Fetching user ${userEmail} from Firebase`)
+      const ref = doc(db, 'users', userEmail)
       const snap = await getDoc(ref)
       const userData = snap.exists() ? { id: snap.id, ...snap.data() } : null
       
       // 3. Put in localStorage
       if (userData) {
-        setCachedUser(uid, userData)
+        setCachedUser(userEmail, userData)
       }
       
       return userData
     } catch (error) {
-      console.error('Error getting user by ID:', error)
+      console.error('Error getting user by email:', error)
       return null
     }
   })

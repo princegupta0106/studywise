@@ -1,5 +1,5 @@
 // Simple localStorage-based caching utility
-// Keys used: 'user-{uid}', 'course-list', 'course-{courseId}'
+// Keys used: 'user-{email}', 'course-list', 'course-{courseId}'
 
 const CACHE_EXPIRY_HOURS = 24 // Cache expires after 24 hours
 const USER_PREFIX = 'user-'
@@ -60,16 +60,16 @@ export function removeCacheItem(key) {
 }
 
 // User-specific cache functions
-export function getCachedUser(uid) {
-  return getCacheItem(USER_PREFIX + uid)
+export function getCachedUser(userEmail) {
+  return getCacheItem(USER_PREFIX + userEmail)
 }
 
-export function setCachedUser(uid, userData) {
-  setCacheItem(USER_PREFIX + uid, userData)
+export function setCachedUser(userEmail, userData) {
+  setCacheItem(USER_PREFIX + userEmail, userData)
 }
 
-export function removeCachedUser(uid) {
-  removeCacheItem(USER_PREFIX + uid)
+export function removeCachedUser(userEmail) {
+  removeCacheItem(USER_PREFIX + userEmail)
 }
 
 // Course list cache functions
@@ -132,8 +132,8 @@ export function getCacheStats() {
 }
 
 // Invalidate user enrollment cache - called when user enrolls/unenrolls
-export function invalidateUserEnrollmentCache(uid) {
-  console.log(`🔄 Invalidating enrollment cache for user: ${uid}`)
-  removeCachedUser(uid)
+export function invalidateUserEnrollmentCache(userEmail) {
+  console.log(`🔄 Invalidating enrollment cache for user: ${userEmail}`)
+  removeCachedUser(userEmail)
   // Could also clear related course caches if needed
 }
