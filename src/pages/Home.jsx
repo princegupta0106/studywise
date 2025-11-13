@@ -242,7 +242,7 @@ export default function Home() {
         <div className="relative mx-auto" style={{maxWidth: '1200px'}}>
           <input
             type="text"
-            placeholder="Search courses (general biology ..)..."
+            placeholder="Search courses ( general biology .. )"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full p-3 rounded-lg input-dark text-base"

@@ -18,6 +18,7 @@ import Navbar from './components/Navbar'
 import CacheDebugger from './components/CacheDebugger'
 import SignIn from './pages/SignIn'
 import { useCachedAuth } from './contexts/CachedAuthContext'
+import { ToastProvider } from './contexts/ToastContext'
 
 function App() {
   const location = useLocation()
@@ -33,29 +34,31 @@ function App() {
   const hideNavbar = location.pathname === '/signin'
 
   return (
-    <div>
-      {!hideNavbar && <Navbar />}
-      <main style={{ padding: '1rem' }}>
-        <Routes>
-          <Route path="/signin" element={<SignIn />} />
+    <ToastProvider>
+      <div>
+        {!hideNavbar && <Navbar />}
+        <main style={{ padding: '1rem' }}>
+          <Routes>
+            <Route path="/signin" element={<SignIn />} />
 
-          <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
-          <Route path="/buy" element={<RequireAuth><Buy /></RequireAuth>} />
-          <Route path="/course/:courseId" element={<RequireAuth><CourseList /></RequireAuth>} />
-          <Route path="/course/:courseId/item/:itemId" element={<RequireAuth><Content /></RequireAuth>} />
-          <Route path="/course/:courseId/category/:category" element={<RequireAuth><CategoryList /></RequireAuth>} />
-          <Route path="/course/:courseId/files" element={<RequireAuth><FilesDocuments /></RequireAuth>} />
-          <Route path="/chat" element={<RequireAuth><Chat /></RequireAuth>} />
-         
-          <Route path="/group-chats" element={<RequireAuth><GroupChatList /></RequireAuth>} />
-          <Route path="/group-chat/:gcId" element={<RequireAuth><GroupChatView /></RequireAuth>} />
-          <Route path="/links" element={<RequireAuth><Links /></RequireAuth>} />
-          <Route path="/seed" element={<RequireAuth><SeedPage /></RequireAuth>} />
-          <Route path="/admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
-        </Routes>
-      </main>
-      <CacheDebugger />
-    </div>
+            <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
+            <Route path="/buy" element={<RequireAuth><Buy /></RequireAuth>} />
+            <Route path="/course/:courseId" element={<RequireAuth><CourseList /></RequireAuth>} />
+            <Route path="/course/:courseId/item/:itemId" element={<RequireAuth><Content /></RequireAuth>} />
+            <Route path="/course/:courseId/category/:category" element={<RequireAuth><CategoryList /></RequireAuth>} />
+            <Route path="/course/:courseId/files" element={<RequireAuth><FilesDocuments /></RequireAuth>} />
+            <Route path="/chat" element={<RequireAuth><Chat /></RequireAuth>} />
+           
+            <Route path="/group-chats" element={<RequireAuth><GroupChatList /></RequireAuth>} />
+            <Route path="/group-chat/:gcId" element={<RequireAuth><GroupChatView /></RequireAuth>} />
+            <Route path="/links" element={<RequireAuth><Links /></RequireAuth>} />
+            <Route path="/seed" element={<RequireAuth><SeedPage /></RequireAuth>} />
+            <Route path="/admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
+          </Routes>
+        </main>
+        <CacheDebugger />
+      </div>
+    </ToastProvider>
   )
 }
 

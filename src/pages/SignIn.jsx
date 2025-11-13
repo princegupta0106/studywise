@@ -105,7 +105,7 @@ export default function SignIn() {
           </h2>
           <p style={{
             margin: 0,
-            marginBottom: '32px',
+            marginBottom: '24px',
             fontSize: '15px',
             color: 'var(--muted)',
             textAlign: 'center',
@@ -113,6 +113,26 @@ export default function SignIn() {
           }}>
             Sign in to access your courses and continue learning
           </p>
+
+          {/* BITS Pilani restriction notice */}
+          <div style={{
+            padding: '12px 16px',
+            background: 'rgba(59, 130, 246, 0.1)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            borderRadius: '8px',
+            marginBottom: '24px'
+          }}>
+            <p style={{
+              margin: 0,
+              fontSize: '13px',
+              color: '#60a5fa',
+              textAlign: 'center',
+              lineHeight: '1.4'
+            }}>
+              <strong>📚 BITS Pilani Students Only</strong><br />
+              Access is restricted to BITS Pilani email addresses only
+            </p>
+          </div>
 
           <button 
             onClick={handleSignIn} 
