@@ -1,0 +1,238 @@
+{
+  "branches": {
+    "ALL": {
+      "name": "Common for All Branches",
+      "years": {
+        "1": {
+          "semester1": [
+            "biof110biologylaboratory",
+            "mathf111mathematicsi",
+            "biof111generalbiology",
+            "chemf110chemistrylaboratory",
+            "phyf110physicslaboratory",
+            "mef112workshoppractice",
+            "bitsf110engineeringgraphics",
+            "bitsf111thermodynamics",
+            "bitsf112technicalreportwriting",
+            "csf111computerprogramming",
+            "chemf111generalchemistry",
+            "eeef111electricalsciences",
+            "mathf112mathematicsii",
+            "mathf113probabilitystatistics",
+            "phyf111mechanicsoscillationsandwaves"
+          ]
+        }
+      }
+    },
+    "BIO": {
+      "name": "Biotechnology Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "biof211biologicalchemistry",
+            "biof212microbiology",
+            "biof213cellbiology",
+            "biof215biophysics"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "biof311recombinantdnatech"
+          ]
+        }
+      }
+    },
+    "CHEM": {
+      "name": "Chemical Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "chef211chemicalprocesscalculations",
+            "chef214engineeringchemistry",
+            "chef212fluidmechanics",
+            "chef213chemicalengineeringthermodynamics"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "chef311kineticsandreactordesign",
+            "chef312chemicalengineeringlaboratoryi",
+            "chef313separationprocessesii",
+            "chef314processdesignprinciplesi"
+          ]
+        }
+      }
+    },
+    "CIVIL": {
+      "name": "Civil Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "cef231fluidmechanics",
+            "cef213surveying",
+            "cef211mechanicsofsolids",
+            "cef230civilengineeringmaterials"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "cef320designofreinforcedconcretestructure",
+            "cef312hydraulicengineering",
+            "cef313foundationengineering"
+          ]
+        }
+      }
+    },
+    "CSE": {
+      "name": "Computer Science Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "csf214logicincomputerscience",
+            "csf222discretestructuresforcomputerscience",
+            "csf213objectorientedprogramming",
+            "csf215eeef215instrf215ecef215digitaldesign"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "csf351theoryofcomputation",
+            "csf372operatingsystems",
+            "csf301principlesofprogramminglanguages",
+            "csf342computerarchitecture"
+          ]
+        }
+      }
+    },
+    "EEE": {
+      "name": "Electrical & Electronics Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "eeef211ecef211instrf211electricalmachines",
+            "eeef212instrf212electromagnetictheory",
+            "eeef214instrf214electronicdevices",
+            "csf215eeef215instrf215ecef215digitaldesign"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "eeef311communicationsystems",
+            "mef320mff320engineeringoptimization",
+            "eeef313instrf313analoganddigitalvlsidesign"
+          ]
+        }
+      }
+    },
+    "ECE": {
+      "name": "Electronics & Communication Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "eeef211ecef211instrf211electricalmachines",
+            "eeef212instrf212electromagnetictheory",
+            "eeef214instrf214electronicdevices",
+            "csf215eeef215instrf215ecef215digitaldesign"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "eeef311communicationsystems",
+            "ecef314electromagneticfieldsandmicrowaveengineering",
+            "ecef434digitalsignalprocess"
+          ]
+        }
+      }
+    },
+    "ENI": {
+      "name": "Electronics & Instrumentation Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "eeef211ecef211instrf211electricalmachines",
+            "eeef212instrf212electromagnetictheory",
+            "eeef214instrf214electronicdevices",
+            "csf215eeef215instrf215ecef215digitaldesign"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "instrf311electronicinstrumentsandinstrumentationtechnology",
+            "instrf312transducersandmeasurementtechniques",
+            "eeef313instrf313analoganddigitalvlsidesign"
+          ]
+        }
+      }
+    },
+    "ENC": {
+      "name": "Electronics & Computer Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "csf215eeef215instrf215ecef215digitaldesign",
+            "csf222discretestructuresforcomputerscience",
+            "eeef214instrf214electronicdevices",
+            "csf213objectorientedprogramming",
+            "mathf211mathematicsiii"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "eeef313instrf313analoganddigitalvlsidesign",
+            "csf342computerarchitecture"
+          ]
+        }
+      }
+    },
+    "MECH": {
+      "name": "Mechanical Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "mef211mff211mechanicsofsolids",
+            "mef212fluidmechanics",
+            "mef216mff216materialsscienceandengineering",
+            "mef217appliedthermodynamics"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "mef314mff314designofmachineelements",
+            "mef315advancedmanufacturingprocesses",
+            "mef316manufacturingmanagement",
+            "mef317enginesmotorsandmobility"
+          ]
+        }
+      }
+    },
+    "MAN": {
+      "name": "Manufacturing Engineering",
+      "years": {
+        "2": {
+          "semester1": [
+            "mathf211mathematicsiii",
+            "mef211mff211mechanicsofsolids",
+            "mef216mff216materialsscienceandengineering",
+            "mff217machinedrawing",
+            "mff218transportphenomenainmanufacturing"
+          ]
+        },
+        "3": {
+          "semester1": [
+            "mef314mff314designofmachineelements",
+            "mff315automationandcontrol",
+            "mff316machiningandmachinetool"
+          ]
+        }
+      }
+    }
+  }
+}

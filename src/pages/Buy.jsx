@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getCourseList, getUserById } from '../firebase/api'
 import { useCachedAuth } from '../contexts/CachedAuthContext'
 import { doc, setDoc, arrayUnion, updateDoc, arrayRemove } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import ConfirmationModal from '../components/ConfirmationModal'
+import { fuzzySearchCourses } from '../utils/fuzzySearch'
 
 export default function Buy() {
   const { user } = useCachedAuth() || {}
@@ -38,7 +39,7 @@ export default function Buy() {
         // Step 2: Get user enrollment data (uses localStorage cache internally)
         let enrolledCourses = []
         if (user) {
-          const userDoc = await getUserById(user.email)
+          const userDoc = await getUserById(user.uid)
           enrolledCourses = userDoc?.courses || []
         }
         
@@ -76,7 +77,7 @@ export default function Buy() {
     setEnrolling(courseId)
     
     try {
-      const userRef = doc(db, 'users', user.email)
+      const userRef = doc(db, 'users', user.uid)
       
       // Update Firebase
       if (action === 'unenroll') {
@@ -94,12 +95,7 @@ export default function Buy() {
       
       // Clear user cache in background for future calls
       const { invalidateUserEnrollmentCache } = await import('../utils/localCache')
-      invalidateUserEnrollmentCache(user.email)
-      
-      // Refresh the entire website to sync changes across all pages
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      invalidateUserEnrollmentCache(user.uid)
       
     } catch (e) {
       alert('Failed to update enrollment: ' + e.message)
@@ -119,6 +115,28 @@ export default function Buy() {
     setConfirmModal({ isOpen: false, courseId: null, courseName: '', action: '' })
   }
 
+  // Apply fuzzy search filtering with typo tolerance
+  const filteredCourses = React.useMemo(() => {
+    let filtered = courses
+    
+    // Apply fuzzy search if there's a search query
+    if (search.trim()) {
+      filtered = fuzzySearchCourses(courses, search, {
+        threshold: 0.4,         // Good balance for typo tolerance
+        maxResults: courses.length, // Don't limit results here
+        searchFields: ['name', 'title', 'description']
+      })
+    }
+    
+    // Sort to show enrolled courses first
+    return filtered.slice().sort((a, b) => {
+      const aEn = enrolled.includes(a.id)
+      const bEn = enrolled.includes(b.id)
+      if (aEn === bEn) return 0
+      return aEn ? -1 : 1
+    })
+  }, [courses, search, enrolled])
+
   if (loading) return <div>Loading courses…</div>
 
   return (
@@ -134,26 +152,13 @@ export default function Buy() {
             id="course-search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search courses by title or description..."
+            placeholder="Search courses (typos OK)..."
             className="w-full p-3 rounded input-dark text-lg"
           />
         </div>
 
         <div className="card-grid">
-        {courses
-          .filter(c => {
-            if (!search) return true
-            const q = search.toLowerCase()
-            return (c.name || c.title || '').toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)
-          })
-          .slice() // copy to avoid mutating original
-          .sort((a, b) => {
-            const aEn = enrolled.includes(a.id)
-            const bEn = enrolled.includes(b.id)
-            if (aEn === bEn) return 0
-            return aEn ? -1 : 1
-          })
-          .map(course => (
+        {filteredCourses.map((course, index) => (
           <div key={course.id} className="course-card">
             <div className="grow">
               <h3 className="font-medium text-base mb-4" style={{color: '#c7c7c7'}}>
