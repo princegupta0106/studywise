@@ -846,10 +846,10 @@ export default function Home() {
                     handleEnrollClick(c.id, c.name || c.title)
                   }}
                   disabled={enrolling === c.id}
-                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500/80 hover:bg-red-500 text-white text-xs font-bold transition-all duration-200 opacity-70 hover:opacity-100 z-10"
+                  className="absolute top-2 right-2 w-6 h-6 bg-transparent hover:bg-gray-700/30 text-gray-500 hover:text-gray-300 transition-all duration-200 opacity-60 hover:opacity-100 z-10 flex items-center justify-center"
                   title="Remove course"
                 >
-                  {enrolling === c.id ? '...' : '×'}
+                  {enrolling === c.id ? '⋯' : '✕'}
                 </button>
                 
                 <div className="grow">

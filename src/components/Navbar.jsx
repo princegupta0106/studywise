@@ -60,12 +60,12 @@ const Navbar = () => {
 
   return (
     <nav className="w-full sticky top-0 z-50">
-      <div className="max-w-full mx-auto  sm:px-4 lg:px-6">
-        <div className="flex items-center h-16">
+      <div className="max-w-full mx-auto pl-[15px] sm:pl-[15px] lg:pl-[15px]">
+        <div className="flex items-center h-16 ">
           <div className="flex-shrink-0">
             <div className="flex items-center space-x-3 logo-container transform transition-transform duration-300 ease-linear hover:scale-105">
               <Logo />
-              <Link to="/" className="font-bold text-lg brand-name hidden md:block hover:text-yellow-300 transition-colors">StudyWise</Link>
+              <Link to="/" className="font-bold text-lg brand-name hidden md:block hover:text-yellow-300 transition-colors ">StudyWise</Link>
             </div>
           </div>
         {/* Desktop Navigation */}
