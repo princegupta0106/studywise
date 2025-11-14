@@ -6,6 +6,7 @@ import { getCourseList, getCourse, getUserById } from '../firebase/api'
 import { Link, useLocation } from 'react-router-dom'
 import { fuzzySearchCourses } from '../utils/fuzzySearch'
 import branchCoursesData from '../data/branchCourses.json'
+import { useTypewriter } from '../hooks/useTypewriter'
 
 // Notification function
 const showNotification = (message, type = 'success', duration = 1000) => {
@@ -83,6 +84,21 @@ export default function Home() {
   const [selectedMscBranch, setSelectedMscBranch] = useState('') // For MSC branch selection
   const [selectedBeBranch, setSelectedBeBranch] = useState('') // For BE branch selection when in MSC year 3/4
   const [isImporting, setIsImporting] = useState(false)
+
+  // Typewriter effect for search placeholder
+  const searchTexts = [
+    'General Biology',
+    'Object Oriented Programming', 
+    'Data Structures',
+    'Machine Learning',
+    'Quantum Mechanics',
+    'Digital Signal Processing',
+    'Thermodynamics',
+    'Computer Networks',
+    'Organic Chemistry',
+    'Discrete Mathematics'
+  ]
+  const typewriterText = useTypewriter(searchTexts, 100, 50, 1500)
 
   // Function to load/reload all home data
   const loadHomeData = async (forceRefresh = false) => {
@@ -426,7 +442,7 @@ export default function Home() {
         <div className="relative mx-auto" style={{maxWidth: '1200px'}}>
           <input
             type="text"
-            placeholder="Search courses ( general biology .. )"
+            placeholder={searchQuery ? '' : `${typewriterText}${typewriterText ? '' : ''} `}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full p-3 rounded-lg input-dark text-base"

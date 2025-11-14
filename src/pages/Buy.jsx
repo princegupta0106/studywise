@@ -5,6 +5,7 @@ import { useCachedAuth } from '../contexts/CachedAuthContext'
 import { doc, setDoc, arrayUnion, updateDoc, arrayRemove } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { fuzzySearchCourses } from '../utils/fuzzySearch'
+import { useTypewriter } from '../hooks/useTypewriter'
 
 // Notification function
 const showNotification = (message, type = 'success', duration = 1000) => {
@@ -72,6 +73,22 @@ export default function Buy() {
   const [loading, setLoading] = useState(true)
   const [enrolling, setEnrolling] = useState('')
   const [search, setSearch] = useState('')
+
+  // Typewriter effect for search placeholder
+  const searchTexts = [
+    'Computer Architecture',
+    'Fluid Mechanics', 
+    'Electromagnetic Theory',
+    'Data Mining',
+    'Molecular Biology',
+    'Linear Algebra',
+    'Signal Processing',
+    'Materials Science',
+    'Statistical Mechanics',
+    'Software Engineering'
+  ]
+  const typewriterText = useTypewriter(searchTexts, 90, 45, 1800)
+  const [searchFocused, setSearchFocused] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -191,7 +208,9 @@ export default function Buy() {
             id="course-search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search courses (typos OK)..."
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            placeholder={search || searchFocused ? '' : `Search courses ${typewriterText}..`}
             className="w-full p-3 rounded input-dark text-lg"
           />
         </div>
