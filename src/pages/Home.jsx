@@ -347,7 +347,7 @@ export default function Home() {
               
               // Map short codes back to full names
               const branchCodeMap = {
-                'BIO': 'BE Biotechnology',
+                'BIOTECH': 'BE Biotechnology',
                 'CHEM': 'BE Chemical', 
                 'CIVIL': 'BE Civil',
                 'CSE': 'BE Computer Science',
@@ -356,7 +356,7 @@ export default function Home() {
                 'ENI': 'BE Electronics and Instrumentation',
                 'ENC': 'BE Electronics and Computer Engineering',
                 'MECH': 'BE Mechanical',
-                'MAN': 'BE Manufacturing'
+                'MANU': 'BE Manufacturing'
               }
               
               const fullBranchName = branchCodeMap[selectedBeBranch]
