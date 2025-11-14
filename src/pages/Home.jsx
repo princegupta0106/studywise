@@ -77,8 +77,11 @@ export default function Home() {
   const [enrolling, setEnrolling] = useState('')
 
   // Branch and year selection state
+  const [selectedProgram, setSelectedProgram] = useState('') // 'BE' or 'MSC'
   const [selectedBranch, setSelectedBranch] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
+  const [selectedMscBranch, setSelectedMscBranch] = useState('') // For MSC branch selection
+  const [selectedBeBranch, setSelectedBeBranch] = useState('') // For BE branch selection when in MSC year 3/4
   const [isImporting, setIsImporting] = useState(false)
 
   // Function to load/reload all home data
@@ -245,25 +248,111 @@ export default function Home() {
       let courseIds = []
       
       if (selectedYear === '1') {
-        // For year 1, get common courses
+        // For year 1, get common courses (same for BE and MSC)
         courseIds = branchCoursesData.BE?.year1?.['all branches'] || []
       } else {
-        // For other years, need branch selection
-        if (!selectedBranch) {
-          showNotification('Please select branch', 'error')
+        // For year 2+, check program type
+        if (!selectedProgram) {
+          showNotification('Please select program type (BE/MSC)', 'error')
           setIsImporting(false)
           return
         }
-        
-        const yearKey = `year${selectedYear}`
-        const yearData = branchCoursesData.BE?.[yearKey]
-        if (yearData) {
-          // Find the branch data (case-insensitive search)
-          const branchKey = Object.keys(yearData).find(key => 
-            key.toLowerCase().includes(selectedBranch.toLowerCase())
-          )
-          if (branchKey) {
-            courseIds = yearData[branchKey] || []
+
+        if (selectedProgram === 'BE') {
+          // BE program logic (same as before)
+          if (!selectedBranch) {
+            showNotification('Please select BE branch', 'error')
+            setIsImporting(false)
+            return
+          }
+          
+          const yearKey = `year${selectedYear}`
+          const yearData = branchCoursesData.BE?.[yearKey]
+          if (yearData) {
+            const branchKey = Object.keys(yearData).find(key => 
+              key.toLowerCase().includes(selectedBranch.toLowerCase())
+            )
+            if (branchKey) {
+              courseIds = yearData[branchKey] || []
+            }
+          }
+        } else if (selectedProgram === 'MSC') {
+          // MSC program logic
+          if (!selectedMscBranch) {
+            showNotification('Please select MSC branch', 'error')
+            setIsImporting(false)
+            return
+          }
+
+          if (selectedYear === '2') {
+            // MSC Year 2: Only MSC courses
+            const yearData = branchCoursesData.MSC?.year2
+            if (yearData && yearData[selectedMscBranch]) {
+              courseIds = yearData[selectedMscBranch] || []
+            }
+          } else if (selectedYear === '3') {
+            // MSC Year 3: MSC courses + BE courses (need BE branch selection)
+            if (!selectedBeBranch) {
+              showNotification('Please select BE branch for additional courses', 'error')
+              setIsImporting(false)
+              return
+            }
+            
+            // Get MSC year 3 courses
+            const mscData = branchCoursesData.MSC?.year3
+            const mscCourses = mscData?.[selectedMscBranch] || []
+            
+            // Get BE year 2 courses
+            const beData = branchCoursesData.BE?.year2
+            let beCourses = []
+            if (beData) {
+              const branchKey = Object.keys(beData).find(key => 
+                key.toLowerCase().includes(selectedBeBranch.toLowerCase())
+              )
+              if (branchKey) {
+                beCourses = beData[branchKey] || []
+              }
+            }
+            
+            courseIds = [...mscCourses, ...beCourses]
+          } else if (selectedYear === '4') {
+            // MSC Year 4: Only BE year 3 courses
+            if (!selectedBeBranch) {
+              showNotification('Please select BE branch', 'error')
+              setIsImporting(false)
+              return
+            }
+            
+            const beData = branchCoursesData.BE?.year3
+            if (beData) {
+              // Debug: let's see what we're comparing
+              console.log('Available BE year3 branches:', Object.keys(beData))
+              console.log('Selected BE branch code:', selectedBeBranch)
+              
+              // Map short codes back to full names
+              const branchCodeMap = {
+                'BIO': 'BE Biotechnology',
+                'CHEM': 'BE Chemical', 
+                'CIVIL': 'BE Civil',
+                'CSE': 'BE Computer Science',
+                'EEE': 'BE Electrical and Electronics',
+                'ECE': 'BE Electronics and Communications',
+                'ENI': 'BE Electronics and Instrumentation',
+                'ENC': 'BE Electronics and Computer Engineering',
+                'MECH': 'BE Mechanical',
+                'MAN': 'BE Manufacturing'
+              }
+              
+              const fullBranchName = branchCodeMap[selectedBeBranch]
+              console.log('Mapped to full name:', fullBranchName)
+              
+              if (fullBranchName && beData[fullBranchName]) {
+                courseIds = beData[fullBranchName] || []
+                console.log('Found courses for MSC Year 4:', courseIds)
+              } else {
+                console.log('No courses found for branch:', selectedBeBranch)
+              }
+            }
           }
         }
       }
@@ -413,7 +502,10 @@ export default function Home() {
                       key={year}
                       onClick={() => {
                         setSelectedYear(year)
+                        setSelectedProgram('')
                         setSelectedBranch('')
+                        setSelectedMscBranch('')
+                        setSelectedBeBranch('')
                       }}
                       className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 transform hover:scale-105 ${
                         selectedYear === year
@@ -430,99 +522,249 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Branch Selection - Compact Design */}
-              {selectedYear && (
+              {/* Program Type Selection */}
+              {selectedYear && selectedYear !== '1' && (
+                <div>
+                  <label className="block text-lg font-semibold mb-4" style={{color: '#c7c7c7'}}>Select Program Type</label>
+                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                    {['BE', 'MSC'].map(program => (
+                      <button
+                        key={program}
+                        onClick={() => {
+                          setSelectedProgram(program)
+                          setSelectedBranch('')
+                          setSelectedMscBranch('')
+                          setSelectedBeBranch('')
+                        }}
+                        className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 transform hover:scale-105 ${
+                          selectedProgram === program
+                            ? 'border-blue-500 bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/20'
+                            : 'border-gray-600 bg-gray-700/30 text-gray-300 hover:border-gray-500 hover:bg-gray-600/30'
+                        }`}
+                      >
+                        <div className="text-xl">{program}</div>
+                        <div className="text-xs opacity-70 mt-1">
+                          {program === 'BE' ? 'Bachelor of Engineering' : 'Master of Science'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Year 1 - Common for all */}
+              {selectedYear === '1' && (
+                <div className="flex justify-center">
+                  <div className="px-6 py-2 bg-blue-500/20 border-2 border-blue-500 text-blue-300 rounded-lg font-medium">
+                    Common Courses for All Programs
+                  </div>
+                </div>
+              )}
+
+              {/* BE Branch Selection */}
+              {selectedProgram === 'BE' && selectedYear !== '1' && (
+                <div>
+                  <label className="block text-sm font-medium mb-3" style={{color: '#c7c7c7'}}>Select BE Branch</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                    {(() => {
+                      const yearKey = `year${selectedYear}`
+                      const yearData = branchCoursesData.BE?.[yearKey] || {}
+                      const branches = Object.keys(yearData).map(fullName => {
+                        const branchCodes = {
+                          'BE Biotechnology': 'BIO',
+                          'BE Chemical': 'CHEM', 
+                          'BE Civil': 'CIVIL',
+                          'BE Computer Science': 'CSE',
+                          'BE Electrical and Electronics': 'EEE',
+                          'BE Electronics and Communications': 'ECE',
+                          'BE Electronics and Instrumentation': 'ENI',
+                          'BE Electronics and Computer Engineering': 'ENC',
+                          'BE Mechanical': 'MECH',
+                          'BE Manufacturing': 'MAN'
+                        }
+                        return {
+                          code: branchCodes[fullName] || fullName,
+                          fullName: fullName
+                        }
+                      })
+                      
+                      return branches.map(({ code, fullName }) => (
+                        <button
+                          key={code}
+                          onClick={() => setSelectedBranch(code)}
+                          className={`p-2 rounded-lg border text-xs font-medium transition-all duration-200 hover:scale-105 ${
+                            selectedBranch === code
+                              ? 'border-blue-500 bg-blue-500/20 text-blue-300'
+                              : 'border-gray-600 bg-gray-700/30 text-gray-300 hover:border-gray-500 hover:bg-gray-600/30'
+                          }`}
+                          title={fullName}
+                        >
+                          <div className="font-bold text-sm">{code}</div>
+                          <div className="text-[10px] opacity-75 leading-tight">
+                            {fullName.replace('BE ', '').split(' ').slice(0, 2).join(' ')}
+                          </div>
+                        </button>
+                      ))
+                    })()}
+                  </div>
+                </div>
+              )}
+
+              {/* MSC Branch Selection */}
+              {selectedProgram === 'MSC' && (
+                <div>
+                  <label className="block text-sm font-medium mb-3" style={{color: '#c7c7c7'}}>Select MSC Branch</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    {Object.keys(branchCoursesData.MSC?.year2 || {}).map(mscBranch => {
+                      const shortName = mscBranch.replace('MSc ', '')
+                      return (
+                        <button
+                          key={mscBranch}
+                          onClick={() => setSelectedMscBranch(mscBranch)}
+                          className={`p-2 rounded-lg border text-xs font-medium transition-all duration-200 hover:scale-105 ${
+                            selectedMscBranch === mscBranch
+                              ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                              : 'border-gray-600 bg-gray-700/30 text-gray-300 hover:border-gray-500 hover:bg-gray-600/30'
+                          }`}
+                          title={mscBranch}
+                        >
+                          <div className="font-bold text-sm">{shortName}</div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* BE Branch Selection for MSC Year 3/4 */}
+              {selectedProgram === 'MSC' && selectedMscBranch && (selectedYear === '3' || selectedYear === '4') && (
                 <div>
                   <label className="block text-sm font-medium mb-3" style={{color: '#c7c7c7'}}>
-                    Select Your Branch {selectedYear === '1' ? '(Common for all)' : ''}
+                    Select BE Branch {selectedYear === '3' ? '(for additional courses)' : '(for Year 4 courses)'}
                   </label>
-                  {selectedYear === '1' ? (
-                    <div className="flex justify-center">
-                      <div className="px-6 py-2 bg-blue-500/20 border-2 border-blue-500 text-blue-300 rounded-lg font-medium">
-                        Common Courses for All Branches
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                      {(() => {
-                        const yearKey = `year${selectedYear}`
-                        const yearData = branchCoursesData.BE?.[yearKey] || {}
-                        const branches = Object.keys(yearData).map(fullName => {
-                          // Extract short codes from full names
-                          const branchCodes = {
-                            'BE Biotechnology': 'BIO',
-                            'BE Chemical': 'CHEM', 
-                            'BE Civil': 'CIVIL',
-                            'BE Computer Science': 'CSE',
-                            'BE Electrical and Electronics': 'EEE',
-                            'BE Electronics and Communications': 'ECE',
-                            'BE Electronics and Instrumentation': 'ENI',
-                            'BE Electronics and Computer Engineering': 'ENC',
-                            'BE Mechanical': 'MECH',
-                            'BE Manufacturing': 'MAN'
-                          }
-                          return {
-                            code: branchCodes[fullName] || fullName,
-                            fullName: fullName
-                          }
-                        })
-                        
-                        return branches.map(({ code, fullName }) => (
-                          <button
-                            key={code}
-                            onClick={() => setSelectedBranch(code)}
-                            className={`p-2 rounded-lg border text-xs font-medium transition-all duration-200 hover:scale-105 ${
-                              selectedBranch === code
-                                ? 'border-blue-500 bg-blue-500/20 text-blue-300'
-                                : 'border-gray-600 bg-gray-700/30 text-gray-300 hover:border-gray-500 hover:bg-gray-600/30'
-                            }`}
-                            title={fullName}
-                          >
-                            <div className="font-bold text-sm">{code}</div>
-                            <div className="text-[10px] opacity-75 leading-tight">
-                              {fullName.replace('BE ', '').split(' ').slice(0, 2).join(' ')}
-                            </div>
-                          </button>
-                        ))
-                      })()}
-                    </div>
-                  )}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                    {(() => {
+                      const yearKey = selectedYear === '3' ? 'year2' : 'year3'
+                      const yearData = branchCoursesData.BE?.[yearKey] || {}
+                      const branches = Object.keys(yearData).map(fullName => {
+                        const branchCodes = {
+                          'BE Biotechnology': 'BIO',
+                          'BE Chemical': 'CHEM', 
+                          'BE Civil': 'CIVIL',
+                          'BE Computer Science': 'CSE',
+                          'BE Electrical and Electronics': 'EEE',
+                          'BE Electronics and Communications': 'ECE',
+                          'BE Electronics and Instrumentation': 'ENI',
+                          'BE Electronics and Computer Engineering': 'ENC',
+                          'BE Mechanical': 'MECH',
+                          'BE Manufacturing': 'MAN'
+                        }
+                        return {
+                          code: branchCodes[fullName] || fullName,
+                          fullName: fullName
+                        }
+                      })
+                      
+                      return branches.map(({ code, fullName }) => (
+                        <button
+                          key={code}
+                          onClick={() => setSelectedBeBranch(code)}
+                          className={`p-2 rounded-lg border text-xs font-medium transition-all duration-200 hover:scale-105 ${
+                            selectedBeBranch === code
+                              ? 'border-green-500 bg-green-500/20 text-green-300'
+                              : 'border-gray-600 bg-gray-700/30 text-gray-300 hover:border-gray-500 hover:bg-gray-600/30'
+                          }`}
+                          title={fullName}
+                        >
+                          <div className="font-bold text-sm">{code}</div>
+                          <div className="text-[10px] opacity-75 leading-tight">
+                            {fullName.replace('BE ', '').split(' ').slice(0, 2).join(' ')}
+                          </div>
+                        </button>
+                      ))
+                    })()}
+                  </div>
                 </div>
               )}
 
               {/* Course Preview */}
-              {selectedYear && (selectedYear === '1' || selectedBranch) && (() => {
+              {(() => {
+                let shouldShow = false
                 let courseData = []
                 let branchName = ''
                 
                 if (selectedYear === '1') {
-                  // For year 1, get common courses
+                  shouldShow = true
                   courseData = branchCoursesData.BE?.year1?.['all branches'] || []
-                  branchName = 'Common for All'
-                } else {
-                  // For other years, get branch-specific courses
+                  branchName = 'Common for All Programs'
+                } else if (selectedProgram === 'BE' && selectedBranch) {
+                  shouldShow = true
                   const yearKey = `year${selectedYear}`
                   const yearData = branchCoursesData.BE?.[yearKey]
-                  if (yearData && selectedBranch) {
-                    // Find the branch data (case-insensitive search)
+                  if (yearData) {
                     const branchKey = Object.keys(yearData).find(key => 
                       key.toLowerCase().includes(selectedBranch.toLowerCase())
                     )
                     if (branchKey) {
                       courseData = yearData[branchKey] || []
-                      branchName = branchKey
+                      branchName = `BE ${branchKey}`
+                    }
+                  }
+                } else if (selectedProgram === 'MSC' && selectedMscBranch) {
+                  if (selectedYear === '2') {
+                    shouldShow = true
+                    courseData = branchCoursesData.MSC?.year2?.[selectedMscBranch] || []
+                    branchName = `${selectedMscBranch} - Year 2`
+                  } else if (selectedYear === '3' && selectedBeBranch) {
+                    shouldShow = true
+                    const mscData = branchCoursesData.MSC?.year3?.[selectedMscBranch] || []
+                    const beData = branchCoursesData.BE?.year2
+                    let beCourses = []
+                    if (beData) {
+                      const branchKey = Object.keys(beData).find(key => 
+                        key.toLowerCase().includes(selectedBeBranch.toLowerCase())
+                      )
+                      if (branchKey) {
+                        beCourses = beData[branchKey] || []
+                      }
+                    }
+                    courseData = [...mscData, ...beCourses]
+                    branchName = `${selectedMscBranch} Year 3 + BE ${selectedBeBranch} Year 2`
+                  } else if (selectedYear === '4' && selectedBeBranch) {
+                    shouldShow = true
+                    const beData = branchCoursesData.BE?.year3
+                    if (beData) {
+                      // Map short codes back to full names
+                      const branchCodeMap = {
+                        'BIO': 'BE Biotechnology',
+                        'CHEM': 'BE Chemical', 
+                        'CIVIL': 'BE Civil',
+                        'CSE': 'BE Computer Science',
+                        'EEE': 'BE Electrical and Electronics',
+                        'ECE': 'BE Electronics and Communications',
+                        'ENI': 'BE Electronics and Instrumentation',
+                        'ENC': 'BE Electronics and Computer Engineering',
+                        'MECH': 'BE Mechanical',
+                        'MAN': 'BE Manufacturing'
+                      }
+                      
+                      const fullBranchName = branchCodeMap[selectedBeBranch]
+                      if (fullBranchName && beData[fullBranchName]) {
+                        courseData = beData[fullBranchName] || []
+                        branchName = `BE ${fullBranchName.replace('BE ', '')} Year 3 (MSC Year 4)`
+                      }
                     }
                   }
                 }
                 
-                return (
+                return shouldShow ? (
                   <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
                     <h4 className="font-medium mb-3" style={{color: '#c7c7c7'}}>
-                      Courses to be enrolled (Semester 1) - {branchName}:
+                      Courses to be enrolled - {branchName}:
                     </h4>
                     <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                      {courseData.map(courseId => (
-                        <span key={courseId} className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs font-medium">
+                      {courseData.map((courseId, index) => (
+                        <span key={`${courseId}-${index}`} className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs font-medium">
                           {courseId}
                         </span>
                       ))}
@@ -531,11 +773,19 @@ export default function Home() {
                       {courseData.length} courses will be added to your enrollment
                     </p>
                   </div>
-                )
+                ) : null
               })()}
 
               {/* Import Button */}
-              {selectedYear && (selectedYear === '1' || selectedBranch) && (
+              {(() => {
+                if (selectedYear === '1') return true
+                if (selectedProgram === 'BE' && selectedBranch) return true
+                if (selectedProgram === 'MSC' && selectedMscBranch) {
+                  if (selectedYear === '2') return true
+                  if ((selectedYear === '3' || selectedYear === '4') && selectedBeBranch) return true
+                }
+                return false
+              })() && (
                 <div className="text-center">
                   <button
                     onClick={handleBulkEnrollment}
