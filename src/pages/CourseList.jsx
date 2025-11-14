@@ -49,10 +49,10 @@ export default function CourseList() {
       description: 'Additional files and documents',
       color: 'bg-purple-600'
     },
-    'videos': { 
-      displayName: 'Videos', 
-      description: 'Video lectures and tutorials',
-      color: 'bg-red-600'
+    'group-chat': { 
+      displayName: 'Group Chat', 
+      description: 'Course discussion and chat',
+      color: 'bg-green-600'
     },
     'guide': { 
       displayName: 'Guides & Articles', 
@@ -62,7 +62,7 @@ export default function CourseList() {
   }
 
   // Always show all standard categories regardless of content
-  const allStandardCategories = ['bits library pyqs', 'guide', 'videos']
+  const allStandardCategories = ['bits library pyqs', 'guide', 'group-chat']
   const hasFolderItems = course?.folder_items && course.folder_items.length > 0
   
   // Create display categories: folders first, then standard categories
@@ -94,10 +94,19 @@ export default function CourseList() {
             itemCount = (groups[category] || []).length
           }
           
-          // Special handling for "Files & Documents" category
-          const linkTo = category === 'others' 
-            ? `/course/${courseId}/files`
-            : `/course/${courseId}/category/${encodeURIComponent(category)}`
+          // Special handling for different category types
+          let linkTo, itemDescription
+          if (category === 'others') {
+            linkTo = `/course/${courseId}/files`
+            itemDescription = `${course?.folder_items?.length || 0} folders`
+          } else if (category === 'group-chat') {
+            const gcId = course?.gc || courseId  // Use course gc field or fall back to courseId
+            linkTo = `/group-chat/${encodeURIComponent(gcId)}`
+            itemDescription = 'Course discussion'
+          } else {
+            linkTo = `/course/${courseId}/category/${encodeURIComponent(category)}`
+            itemDescription = `${itemCount} items`
+          }
           
           return (
             <Link 
@@ -107,9 +116,7 @@ export default function CourseList() {
             >
               <h3 className="font-medium text-lg mb-2 truncate" style={{color: 'var(--text-bright)'}}>{info.displayName}</h3>
               <p className="text-gray-400 text-sm mb-3 line-clamp-2">
-                {category === 'others' 
-                  ? `${course?.folder_items?.length || 0} folders` 
-                  : `${itemCount} items`}
+                {itemDescription}
               </p>
               <div className="text-yellow-500 text-sm font-medium">View →</div>
             </Link>

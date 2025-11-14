@@ -4,8 +4,66 @@ import { getCourseList, getUserById } from '../firebase/api'
 import { useCachedAuth } from '../contexts/CachedAuthContext'
 import { doc, setDoc, arrayUnion, updateDoc, arrayRemove } from 'firebase/firestore'
 import { db } from '../firebase/config'
-import ConfirmationModal from '../components/ConfirmationModal'
 import { fuzzySearchCourses } from '../utils/fuzzySearch'
+
+// Notification function
+const showNotification = (message, type = 'success', duration = 1000) => {
+  const notification = document.createElement('div')
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid;
+    max-width: 400px;
+    min-width: 300px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: slideInFromRight 0.3s ease-out forwards;
+    font-family: system-ui, -apple-system, sans-serif;
+    ${type === 'error' ? 
+      'background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;' :
+      'background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); color: #4ade80;'
+    }
+  `
+  
+  const icon = type === 'error' ? '❌' : '✅'
+  notification.innerHTML = `
+    <div style="display: flex; align-items: flex-start; gap: 12px;">
+      <div style="margin-top: 1px; flex-shrink: 0; font-size: 16px;">${icon}</div>
+      <div style="flex: 1;">${message}</div>
+      <button onclick="this.parentElement.parentElement.remove()" style="
+        background: none; border: none; color: currentColor; cursor: pointer;
+        padding: 0; margin-top: 1px; opacity: 0.7; font-size: 16px;
+      ">×</button>
+    </div>
+  `
+  
+  if (!document.querySelector('#notification-styles')) {
+    const style = document.createElement('style')
+    style.id = 'notification-styles'
+    style.textContent = `
+      @keyframes slideInFromRight {
+        0% { transform: translateX(100%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+      }
+    `
+    document.head.appendChild(style)
+  }
+  
+  document.body.appendChild(notification)
+  
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove()
+    }
+  }, duration)
+}
 
 export default function Buy() {
   const { user } = useCachedAuth() || {}
@@ -14,12 +72,6 @@ export default function Buy() {
   const [loading, setLoading] = useState(true)
   const [enrolling, setEnrolling] = useState('')
   const [search, setSearch] = useState('')
-  const [confirmModal, setConfirmModal] = useState({
-    isOpen: false,
-    courseId: null,
-    courseName: '',
-    action: '', // 'enroll' or 'unenroll'
-  })
 
   useEffect(() => {
     let mounted = true
@@ -58,21 +110,11 @@ export default function Buy() {
     return () => { mounted = false }
   }, [user])
 
-  const handleEnrollClick = (courseId, courseName) => {
+  const handleEnrollClick = async (courseId, courseName) => {
     if (!user) return
     
     const isEnrolled = enrolled.includes(courseId)
-    setConfirmModal({
-      isOpen: true,
-      courseId,
-      courseName,
-      action: isEnrolled ? 'unenroll' : 'enroll',
-    })
-  }
-
-  const handleConfirmEnrollment = async () => {
-    const { courseId, action } = confirmModal
-    if (!user || !courseId) return
+    const action = isEnrolled ? 'unenroll' : 'enroll'
     
     setEnrolling(courseId)
     
@@ -82,8 +124,10 @@ export default function Buy() {
       // Update Firebase
       if (action === 'unenroll') {
         await updateDoc(userRef, { courses: arrayRemove(courseId) })
+        showNotification(`Successfully removed from <strong>${courseName}</strong>`)
       } else {
         await setDoc(userRef, { courses: arrayUnion(courseId) }, { merge: true })
+        showNotification(`Successfully enrolled in <strong>${courseName}</strong>`)
       }
       
       // IMMEDIATE UI UPDATE - don't wait for cache refresh
@@ -98,7 +142,7 @@ export default function Buy() {
       invalidateUserEnrollmentCache(user.uid)
       
     } catch (e) {
-      alert('Failed to update enrollment: ' + e.message)
+      showNotification(`Failed to ${action}: ` + e.message, 'error')
       // Revert UI change on error
       if (action === 'unenroll') {
         setEnrolled(prev => [...prev, courseId])
@@ -107,12 +151,7 @@ export default function Buy() {
       }
     } finally {
       setEnrolling('')
-      setConfirmModal({ isOpen: false, courseId: null, courseName: '', action: '' })
     }
-  }
-
-  const handleCancelConfirmation = () => {
-    setConfirmModal({ isOpen: false, courseId: null, courseName: '', action: '' })
   }
 
   // Apply fuzzy search filtering with typo tolerance
@@ -193,26 +232,6 @@ export default function Buy() {
   </div>
 
   {!user && <div className="mt-4 text-red-600">Sign in to enroll in a course.</div>}
-
-      {/* Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={confirmModal.isOpen}
-        onClose={handleCancelConfirmation}
-        onConfirm={handleConfirmEnrollment}
-        title={confirmModal.action === 'enroll' ? 'Confirm Enrollment' : 'Confirm Unenrollment'}
-        message={
-          confirmModal.action === 'enroll' 
-            ? `Are you sure you want to enroll in "${confirmModal.courseName}"?`
-            : `Are you sure you want to unenroll from "${confirmModal.courseName}"? You will lose access to the course content.`
-        }
-        confirmText={confirmModal.action === 'enroll' ? 'Enroll' : 'Unenroll'}
-        confirmButtonClass={
-          confirmModal.action === 'enroll' 
-            ? 'bg-yellow-500 hover:bg-yellow-600 text-black'
-            : 'bg-red-600 hover:bg-red-700 text-white'
-        }
-        isLoading={enrolling === confirmModal.courseId}
-      />
     </div>
   )
 }

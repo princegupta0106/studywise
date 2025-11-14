@@ -3,16 +3,26 @@ import { useCachedAuth } from '../contexts/CachedAuthContext'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import logoSvg from '../assets/logo.svg'
 
-const Logo = () => (
-  <img 
-    src={logoSvg} 
-    alt="StudyByte Logo" 
-    height="50px" 
-    width="50px" 
-    className="logo-icon"
-    style={{ backgroundColor: 'transparent' }}
-  />
-)
+const Logo = () => {
+  const handleLogoClick = (e) => {
+    e.preventDefault()
+    // Force refresh the entire website
+    window.location.reload()
+  }
+  
+  return (
+    <img 
+      src={logoSvg} 
+      alt="StudyByte Logo" 
+      height="50px" 
+      width="50px" 
+      className="logo-icon cursor-pointer"
+      style={{ backgroundColor: 'transparent' }}
+      onClick={handleLogoClick}
+      title="Click to refresh website"
+    />
+  )
+}
 
 function initialsFrom(user) {
   if (!user) return 'U'
@@ -53,10 +63,10 @@ const Navbar = () => {
       <div className="max-w-full mx-auto  sm:px-4 lg:px-6">
         <div className="flex items-center h-16">
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center space-x-3 logo-container transform transition-transform duration-300 ease-linear hover:scale-105">
+            <div className="flex items-center space-x-3 logo-container transform transition-transform duration-300 ease-linear hover:scale-105">
               <Logo />
-              <span className="font-bold text-lg brand-name hidden md:block">StudyWise</span>
-            </Link>
+              <Link to="/" className="font-bold text-lg brand-name hidden md:block hover:text-yellow-300 transition-colors">StudyWise</Link>
+            </div>
           </div>
         {/* Desktop Navigation */}
         <div className="hidden md:flex md:flex-1 md:justify-center">

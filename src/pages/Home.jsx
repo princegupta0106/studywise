@@ -3,25 +3,78 @@ import { useCachedAuth } from '../contexts/CachedAuthContext'
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { getCourseList, getCourse, getUserById } from '../firebase/api'
-import { Link } from 'react-router-dom'
-import ConfirmationModal from '../components/ConfirmationModal'
+import { Link, useLocation } from 'react-router-dom'
 import { fuzzySearchCourses } from '../utils/fuzzySearch'
 import branchCoursesData from '../data/branchCourses.json'
 
+// Notification function
+const showNotification = (message, type = 'success', duration = 1000) => {
+  const notification = document.createElement('div')
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid;
+    max-width: 400px;
+    min-width: 300px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: slideInFromRight 0.3s ease-out forwards;
+    font-family: system-ui, -apple-system, sans-serif;
+    ${type === 'error' ? 
+      'background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;' :
+      'background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); color: #4ade80;'
+    }
+  `
+  
+  const icon = type === 'error' ? '❌' : '✅'
+  notification.innerHTML = `
+    <div style="display: flex; align-items: flex-start; gap: 12px;">
+      <div style="margin-top: 1px; flex-shrink: 0; font-size: 16px;">${icon}</div>
+      <div style="flex: 1;">${message}</div>
+      <button onclick="this.parentElement.parentElement.remove()" style="
+        background: none; border: none; color: currentColor; cursor: pointer;
+        padding: 0; margin-top: 1px; opacity: 0.7; font-size: 16px;
+      ">×</button>
+    </div>
+  `
+  
+  if (!document.querySelector('#notification-styles')) {
+    const style = document.createElement('style')
+    style.id = 'notification-styles'
+    style.textContent = `
+      @keyframes slideInFromRight {
+        0% { transform: translateX(100%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+      }
+    `
+    document.head.appendChild(style)
+  }
+  
+  document.body.appendChild(notification)
+  
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove()
+    }
+  }, duration)
+}
+
 export default function Home() {
   const { user } = useCachedAuth() || {}
+  const location = useLocation()
   const [courses, setCourses] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [allCourses, setAllCourses] = useState([])
   const [enrolled, setEnrolled] = useState([])
   const [enrolling, setEnrolling] = useState('')
-  const [confirmModal, setConfirmModal] = useState({
-    isOpen: false,
-    courseId: null,
-    courseName: '',
-    action: '', // 'enroll' or 'unenroll'
-  })
 
   // Branch and year selection state
   const [selectedBranch, setSelectedBranch] = useState('')
@@ -68,16 +121,58 @@ export default function Home() {
 
   useEffect(() => {
     let mounted = true
+    let refreshInterval
     
     const load = async () => {
-      await loadHomeData()
+      await loadHomeData(true) // Always force refresh when component loads/user changes
     }
     
-    load()
+    // Load data when user changes or component mounts
+    if (user) {
+      load()
+      
+      // Set up periodic refresh every 30 seconds to keep data fresh
+      refreshInterval = setInterval(() => {
+        if (mounted && user && !document.hidden) {
+          loadHomeData(true)
+        }
+      }, 30000) // Refresh every 30 seconds when page is visible
+      
+      // Refresh data when user returns to the tab/window
+      const handleVisibilityChange = () => {
+        if (!document.hidden && mounted && user) {
+          loadHomeData(true) // Force refresh when tab becomes active
+        }
+      }
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+      
+      return () => {
+        mounted = false
+        if (refreshInterval) {
+          clearInterval(refreshInterval)
+        }
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
+    } else {
+      setCourses([])
+      setEnrolled([])
+    }
+    
     return () => {
       mounted = false
+      if (refreshInterval) {
+        clearInterval(refreshInterval)
+      }
     }
   }, [user])
+  
+  // Reload data when navigating back to Home page
+  useEffect(() => {
+    if (user) {
+      loadHomeData(true) // Force refresh when location changes (coming back from other pages)
+    }
+  }, [location.pathname, user])
 
   // Fuzzy search functionality with typo tolerance
   useEffect(() => {
@@ -95,21 +190,11 @@ export default function Home() {
     setSearchResults(results)
   }, [searchQuery, allCourses])
 
-  const handleEnrollClick = (courseId, courseName) => {
+  const handleEnrollClick = async (courseId, courseName) => {
     if (!user) return
     
     const isEnrolled = enrolled.includes(courseId)
-    setConfirmModal({
-      isOpen: true,
-      courseId,
-      courseName,
-      action: isEnrolled ? 'unenroll' : 'enroll',
-    })
-  }
-
-  const handleConfirmEnrollment = async () => {
-    const { courseId, action } = confirmModal
-    if (!user || !courseId) return
+    const action = isEnrolled ? 'unenroll' : 'enroll'
     
     setEnrolling(courseId)
     
@@ -120,6 +205,7 @@ export default function Home() {
         await updateDoc(userRef, { courses: arrayRemove(courseId) })
         setEnrolled(prev => prev.filter(id => id !== courseId))
         setCourses(prev => prev.filter(c => c.id !== courseId))
+        showNotification(`Successfully removed from <strong>${courseName}</strong>`)
       } else {
         // Enroll
         await setDoc(userRef, { courses: arrayUnion(courseId) }, { merge: true })
@@ -129,6 +215,7 @@ export default function Home() {
         if (newCourse) {
           setCourses(prev => [...prev, { id: courseId, ...newCourse }])
         }
+        showNotification(`Successfully enrolled in <strong>${courseName}</strong>`)
       }
       
       // Clear user cache for future requests
@@ -136,45 +223,53 @@ export default function Home() {
       invalidateUserEnrollmentCache(user.uid)
       
       // Clear search results and search bar
-      setSearchQuery('')
       setSearchResults([])
+      setSearchQuery('')
       
     } catch (e) {
-      alert('Failed to update enrollment: ' + e.message)
+      showNotification(`Failed to ${action}: ` + e.message, 'error')
     } finally {
       setEnrolling('')
-      setConfirmModal({ isOpen: false, courseId: null, courseName: '', action: '' })
     }
   }
 
   const handleBulkEnrollment = async () => {
     if (!user || !selectedYear) {
-      alert('Please select year')
-      return
-    }
-
-    // For year 1, use ALL branch, for others check branch selection
-    const branchToUse = selectedYear === '1' ? 'ALL' : selectedBranch
-    if (!branchToUse) {
-      alert('Please select branch')
+      showNotification('Please select year', 'error')
       return
     }
 
     setIsImporting(true)
 
     try {
-      // Get course IDs for selected branch/year (semester1 only)
-      const branchData = branchCoursesData.branches[branchToUse]
-      if (!branchData || !branchData.years || !branchData.years[selectedYear]) {
-        alert('No data found for selected combination')
-        setIsImporting(false)
-        return
-      }
+      let courseIds = []
       
-      const courseIds = branchData.years[selectedYear].semester1 || []
+      if (selectedYear === '1') {
+        // For year 1, get common courses
+        courseIds = branchCoursesData.BE?.year1?.['all branches'] || []
+      } else {
+        // For other years, need branch selection
+        if (!selectedBranch) {
+          showNotification('Please select branch', 'error')
+          setIsImporting(false)
+          return
+        }
+        
+        const yearKey = `year${selectedYear}`
+        const yearData = branchCoursesData.BE?.[yearKey]
+        if (yearData) {
+          // Find the branch data (case-insensitive search)
+          const branchKey = Object.keys(yearData).find(key => 
+            key.toLowerCase().includes(selectedBranch.toLowerCase())
+          )
+          if (branchKey) {
+            courseIds = yearData[branchKey] || []
+          }
+        }
+      }
 
       if (courseIds.length === 0) {
-        alert('No courses found for selected combination')
+        showNotification('No courses found for selected combination', 'error')
         setIsImporting(false)
         return
       }
@@ -193,7 +288,7 @@ export default function Home() {
       }
 
       if (existingCourseIds.length === 0) {
-        alert('No matching courses found in the database for your selection')
+        showNotification('No matching courses found in the database for your selection', 'error')
         setIsImporting(false)
         return
       }
@@ -202,7 +297,7 @@ export default function Home() {
       const userRef = doc(db, 'users', user.uid)
       await setDoc(userRef, { 
         courses: arrayUnion(...existingCourseIds),
-        branch: branchToUse,
+        branch: selectedBranch || 'ALL',
         year: selectedYear
       }, { merge: true })
 
@@ -215,11 +310,11 @@ export default function Home() {
         window.location.reload()
       }, 1000)
 
-      alert(`Successfully enrolled in ${existingCourseIds.length} courses!`)
+      showNotification(`Successfully enrolled in ${existingCourseIds.length} courses!`)
 
     } catch (error) {
       console.error('Error during bulk enrollment:', error)
-      alert('Failed to enroll in courses. Please try again.')
+      showNotification('Failed to enroll in courses. Please try again.', 'error')
     } finally {
       setIsImporting(false)
     }
@@ -343,34 +438,53 @@ export default function Home() {
                   </label>
                   {selectedYear === '1' ? (
                     <div className="flex justify-center">
-                      <button
-                        onClick={() => setSelectedBranch('ALL')}
-                        className="px-6 py-2 bg-blue-500/20 border-2 border-blue-500 text-blue-300 rounded-lg font-medium"
-                      >
+                      <div className="px-6 py-2 bg-blue-500/20 border-2 border-blue-500 text-blue-300 rounded-lg font-medium">
                         Common Courses for All Branches
-                      </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                      {Object.entries(branchCoursesData.branches)
-                        .filter(([code]) => code !== 'ALL')
-                        .map(([branchCode, branchInfo]) => (
-                        <button
-                          key={branchCode}
-                          onClick={() => setSelectedBranch(branchCode)}
-                          className={`p-2 rounded-lg border text-xs font-medium transition-all duration-200 hover:scale-105 ${
-                            selectedBranch === branchCode
-                              ? 'border-blue-500 bg-blue-500/20 text-blue-300'
-                              : 'border-gray-600 bg-gray-700/30 text-gray-300 hover:border-gray-500 hover:bg-gray-600/30'
-                          }`}
-                          title={branchInfo.name}
-                        >
-                          <div className="font-bold text-sm">{branchCode}</div>
-                          <div className="text-[10px] opacity-75 leading-tight">
-                            {branchInfo.name.split(' ').slice(0, 2).join(' ')}
-                          </div>
-                        </button>
-                      ))}
+                      {(() => {
+                        const yearKey = `year${selectedYear}`
+                        const yearData = branchCoursesData.BE?.[yearKey] || {}
+                        const branches = Object.keys(yearData).map(fullName => {
+                          // Extract short codes from full names
+                          const branchCodes = {
+                            'BE Biotechnology': 'BIO',
+                            'BE Chemical': 'CHEM', 
+                            'BE Civil': 'CIVIL',
+                            'BE Computer Science': 'CSE',
+                            'BE Electrical and Electronics': 'EEE',
+                            'BE Electronics and Communications': 'ECE',
+                            'BE Electronics and Instrumentation': 'ENI',
+                            'BE Electronics and Computer Engineering': 'ENC',
+                            'BE Mechanical': 'MECH',
+                            'BE Manufacturing': 'MAN'
+                          }
+                          return {
+                            code: branchCodes[fullName] || fullName,
+                            fullName: fullName
+                          }
+                        })
+                        
+                        return branches.map(({ code, fullName }) => (
+                          <button
+                            key={code}
+                            onClick={() => setSelectedBranch(code)}
+                            className={`p-2 rounded-lg border text-xs font-medium transition-all duration-200 hover:scale-105 ${
+                              selectedBranch === code
+                                ? 'border-blue-500 bg-blue-500/20 text-blue-300'
+                                : 'border-gray-600 bg-gray-700/30 text-gray-300 hover:border-gray-500 hover:bg-gray-600/30'
+                            }`}
+                            title={fullName}
+                          >
+                            <div className="font-bold text-sm">{code}</div>
+                            <div className="text-[10px] opacity-75 leading-tight">
+                              {fullName.replace('BE ', '').split(' ').slice(0, 2).join(' ')}
+                            </div>
+                          </button>
+                        ))
+                      })()}
                     </div>
                   )}
                 </div>
@@ -378,13 +492,33 @@ export default function Home() {
 
               {/* Course Preview */}
               {selectedYear && (selectedYear === '1' || selectedBranch) && (() => {
-                const branchToUse = selectedYear === '1' ? 'ALL' : selectedBranch
-                const courseData = branchCoursesData.branches[branchToUse]?.years?.[selectedYear]?.semester1 || []
+                let courseData = []
+                let branchName = ''
+                
+                if (selectedYear === '1') {
+                  // For year 1, get common courses
+                  courseData = branchCoursesData.BE?.year1?.['all branches'] || []
+                  branchName = 'Common for All'
+                } else {
+                  // For other years, get branch-specific courses
+                  const yearKey = `year${selectedYear}`
+                  const yearData = branchCoursesData.BE?.[yearKey]
+                  if (yearData && selectedBranch) {
+                    // Find the branch data (case-insensitive search)
+                    const branchKey = Object.keys(yearData).find(key => 
+                      key.toLowerCase().includes(selectedBranch.toLowerCase())
+                    )
+                    if (branchKey) {
+                      courseData = yearData[branchKey] || []
+                      branchName = branchKey
+                    }
+                  }
+                }
                 
                 return (
                   <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
                     <h4 className="font-medium mb-3" style={{color: '#c7c7c7'}}>
-                      Courses to be enrolled (Semester 1) - {selectedYear === '1' ? 'Common for All' : branchCoursesData.branches[branchToUse]?.name}:
+                      Courses to be enrolled (Semester 1) - {branchName}:
                     </h4>
                     <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                       {courseData.map(courseId => (
@@ -438,15 +572,29 @@ export default function Home() {
         ) : (
           <div className="card-grid ">
             {courses.map((c) => (
-              <div key={c.id} className="course-card">
+              <div key={c.id} className="course-card relative group cursor-pointer" onClick={() => window.location.href = `/course/${c.id}`}>
+                {/* Remove button - positioned at top right */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation() // Prevent card click
+                    handleEnrollClick(c.id, c.name || c.title)
+                  }}
+                  disabled={enrolling === c.id}
+                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500/80 hover:bg-red-500 text-white text-xs font-bold transition-all duration-200 opacity-70 hover:opacity-100 z-10"
+                  title="Remove course"
+                >
+                  {enrolling === c.id ? '...' : '×'}
+                </button>
+                
                 <div className="grow">
-                  <h4 className="font-medium text-base mb-4" style={{color: '#c7c7c7'}}>{c.name || c.title || 'Untitled course'}</h4>
+                  <h4 className="font-medium text-base mb-4 pr-8" style={{color: '#c7c7c7'}}>{c.name || c.title || 'Untitled course'}</h4>
                 </div>
                 <div className="mt-auto">
                   <Link 
                     to={`/course/${c.id}`}
                     className="text-xs font-medium" 
                     style={{color: 'var(--yellow)'}}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     View course →
                   </Link>
@@ -456,26 +604,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      {/* Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={confirmModal.isOpen}
-        onClose={handleCancelConfirmation}
-        onConfirm={handleConfirmEnrollment}
-        title={confirmModal.action === 'enroll' ? 'Confirm Enrollment' : 'Confirm Unenrollment'}
-        message={
-          confirmModal.action === 'enroll' 
-            ? `Are you sure you want to enroll in "${confirmModal.courseName}"?`
-            : `Are you sure you want to unenroll from "${confirmModal.courseName}"? You will lose access to the course content.`
-        }
-        confirmText={confirmModal.action === 'enroll' ? 'Enroll' : 'Unenroll'}
-        confirmButtonClass={
-          confirmModal.action === 'enroll' 
-            ? 'bg-yellow-500 hover:bg-yellow-600 text-black'
-            : 'bg-red-600 hover:bg-red-700 text-white'
-        }
-        isLoading={enrolling === confirmModal.courseId}
-      />
     </div>
   )
 }
