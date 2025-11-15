@@ -97,7 +97,7 @@ export function AuthProvider({ children }) {
         `, 'error', 8000)
         
         setLoading(false)
-        return
+        return false // Indicate sign in was blocked
       }
       
       console.log('Sign in successful:', userEmail)
@@ -105,10 +105,19 @@ export function AuthProvider({ children }) {
         <strong>Welcome to Padho BC!</strong><br/>
         Successfully signed in as <strong>${userEmail}</strong>
       `, 'success', 4000)
+      
+      // Wait for auth state to propagate before resolving
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          setLoading(false)
+          resolve(result.user) // Return the user object
+        }, 100)
+      })
     } catch (error) {
       console.error('Sign in error:', error)
       showNotification('Sign in failed. Please try again.', 'error', 4000)
       setLoading(false)
+      throw error // Re-throw the error so SignIn component can handle it
     }
   }
 

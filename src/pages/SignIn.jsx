@@ -1,19 +1,27 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useCachedAuth } from '../contexts/CachedAuthContext'
 import logoSvg from '../assets/logo.svg'
 
 export default function SignIn() {
-  const { signInWithGoogle, loading } = useCachedAuth() || {}
+  const { user, signInWithGoogle, loading } = useCachedAuth() || {}
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || '/'
 
+  // Listen for user authentication and redirect
+  useEffect(() => {
+    if (user && !loading) {
+      console.log('User authenticated in SignIn component, redirecting to:', from)
+      navigate(from, { replace: true })
+    }
+  }, [user, loading, navigate, from])
+
   const handleSignIn = async () => {
     try {
-      await signInWithGoogle()
-      // after sign in, navigate back to origin or home
-      navigate(from, { replace: true })
+      const result = await signInWithGoogle()
+      console.log('SignIn result:', result)
+      // Navigation will be handled by the useEffect above when user state updates
     } catch (err) {
       console.error('Sign in failed', err)
       alert('Sign in failed')
