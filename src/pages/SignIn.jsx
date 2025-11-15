@@ -93,7 +93,7 @@ export default function SignIn() {
 
         {/* Sign in section */}
         <div style={{ marginBottom: '24px' }}>
-          <h2 style={{
+          {/* <h2 style={{
             margin: 0,
             marginBottom: '8px',
             fontSize: '24px',
@@ -112,7 +112,7 @@ export default function SignIn() {
             lineHeight: '1.4'
           }}>
             Sign in to access your courses and continue learning
-          </p>
+          </p> */}
 
           {/* BITS Pilani restriction notice */}
           <div style={{
@@ -204,7 +204,7 @@ export default function SignIn() {
             color: 'var(--muted)',
             lineHeight: '1.4'
           }}>
-            By continuing, you agree to our Terms of Service and Privacy Policy
+            Developed with ❤️ by the Prince Gupta<br></br>
           </p>
         </div>
       </div>

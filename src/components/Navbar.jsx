@@ -65,7 +65,7 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <div className="flex items-center space-x-3 logo-container transform transition-transform duration-300 ease-linear hover:scale-105">
               <Logo />
-              <Link to="/" className="font-bold text-lg brand-name hidden md:block hover:text-yellow-300 transition-colors ">StudyWise</Link>
+              <Link to="/" className="font-bold text-lg brand-name hidden md:block hover:text-yellow-300 transition-colors ">Padhle BC</Link>
             </div>
           </div>
         {/* Desktop Navigation */}
@@ -73,7 +73,7 @@ const Navbar = () => {
             <div className="flex space-x-2 lg:space-x-8 max-w-2xl">
               <Link to="/" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/') ? 'bg-white/10 text-white' : ''}`}>Home</Link>
               <Link to="/links" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/links') ? 'bg-white/10 text-white' : ''}`}>Links</Link>
-              <Link to="/group-chats" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/group-chats') ? 'bg-white/10 text-white' : ''}`}>Chat</Link>
+              <Link to="/group-chats" className={`font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap ${isActiveLink('/group-chats') ? 'bg-white/10 text-white' : ''}`}>Groups</Link>
               {isInCourse && (
                 <span className="font-medium px-2 lg:px-4 py-2 rounded navbar-link whitespace-nowrap bg-white/10 text-white">Course</span>
               )}
@@ -85,9 +85,13 @@ const Navbar = () => {
         <div className="mobile-nav-icons flex-1 justify-center">
           <div className="flex space-x-4">
             <Link to="/" className={`p-2 rounded ${isActiveLink('/') ? 'bg-white/10' : ''}`}>
-              <svg width="30" height="30" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-              </svg>
+              <img 
+                src="/home.svg" 
+                alt="Home" 
+                width="30" 
+                height="30" 
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
             </Link>
             <Link to="/links" className={`p-2 rounded ${isActiveLink('/links') ? 'bg-white/10' : ''}`}>
               <svg width="30" height="30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,6 +145,7 @@ const Navbar = () => {
             <Link onClick={() => setIsOpen(false)} to="/links" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/links') ? 'bg-white/10' : ''}`}>Links</Link>
             <Link onClick={() => setIsOpen(false)} to="/chat" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/chat') ? 'bg-white/10' : ''}`}>Chat</Link>
             <Link onClick={() => setIsOpen(false)} to="/buy" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/buy') ? 'bg-white/10' : ''}`}>All Courses</Link>
+            <Link onClick={() => setIsOpen(false)} to="/chat-admin" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/chat-admin') ? 'bg-white/10' : ''}`}>Chat Admin</Link>
             <div className="pt-3 px-3" style={{borderTop: '1px solid var(--border)'}}>
               <MobileAuthArea onAction={() => setIsOpen(false)} />
             </div>

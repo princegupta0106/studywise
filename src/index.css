@@ -687,3 +687,76 @@ a.no-underline:hover {
   }
 }
 
+/* Smooth Page Transitions */
+.page-transition {
+  will-change: opacity, transform;
+}
+
+.page-transition.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition.fadeOut {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Enhanced smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth link transitions */
+a, button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Card hover effects */
+.course-card, .card-grid > * {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.course-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Navbar transitions */
+.navbar-link {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Button loading state transitions */
+button[disabled] {
+  transition: opacity 0.2s ease-in-out;
+  opacity: 0.6;
+}
+
+/* Input focus transitions */
+input, textarea {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Page load fade-in */
+@keyframes pageLoad {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+  animation: pageLoad 0.3s ease-out;
+}
+

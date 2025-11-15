@@ -285,11 +285,23 @@ export default function Home() {
           const yearKey = `year${selectedYear}`
           const yearData = branchCoursesData.BE?.[yearKey]
           if (yearData) {
-            const branchKey = Object.keys(yearData).find(key => 
-              key.toLowerCase().includes(selectedBranch.toLowerCase())
-            )
-            if (branchKey) {
-              courseIds = yearData[branchKey] || []
+            // Map short codes to full names
+            const branchCodeMap = {
+              'BIO': 'BE Biotechnology',
+              'CHEM': 'BE Chemical', 
+              'CIVIL': 'BE Civil',
+              'CSE': 'BE Computer Science',
+              'EEE': 'BE Electrical and Electronics',
+              'ECE': 'BE Electronics and Communications',
+              'ENI': 'BE Electronics and Instrumentation',
+              'ENC': 'BE Electronics and Computer Engineering',
+              'MECH': 'BE Mechanical',
+              'MANU': 'BE Manufacturing'
+            }
+            
+            const fullBranchName = branchCodeMap[selectedBranch]
+            if (fullBranchName && yearData[fullBranchName]) {
+              courseIds = yearData[fullBranchName] || []
             }
           }
         } else if (selectedProgram === 'MSC') {
@@ -322,11 +334,23 @@ export default function Home() {
             const beData = branchCoursesData.BE?.year2
             let beCourses = []
             if (beData) {
-              const branchKey = Object.keys(beData).find(key => 
-                key.toLowerCase().includes(selectedBeBranch.toLowerCase())
-              )
-              if (branchKey) {
-                beCourses = beData[branchKey] || []
+              // Map short codes to full names
+              const branchCodeMap = {
+                'BIO': 'BE Biotechnology',
+                'CHEM': 'BE Chemical', 
+                'CIVIL': 'BE Civil',
+                'CSE': 'BE Computer Science',
+                'EEE': 'BE Electrical and Electronics',
+                'ECE': 'BE Electronics and Communications',
+                'ENI': 'BE Electronics and Instrumentation',
+                'ENC': 'BE Electronics and Computer Engineering',
+                'MECH': 'BE Mechanical',
+                'MANU': 'BE Manufacturing'
+              }
+              
+              const fullBranchName = branchCodeMap[selectedBeBranch]
+              if (fullBranchName && beData[fullBranchName]) {
+                beCourses = beData[fullBranchName] || []
               }
             }
             
@@ -596,7 +620,7 @@ export default function Home() {
                           'BE Electronics and Instrumentation': 'ENI',
                           'BE Electronics and Computer Engineering': 'ENC',
                           'BE Mechanical': 'MECH',
-                          'BE Manufacturing': 'MAN'
+                          'BE Manufacturing': 'MANU'
                         }
                         return {
                           code: branchCodes[fullName] || fullName,
@@ -673,7 +697,7 @@ export default function Home() {
                           'BE Electronics and Instrumentation': 'ENI',
                           'BE Electronics and Computer Engineering': 'ENC',
                           'BE Mechanical': 'MECH',
-                          'BE Manufacturing': 'MAN'
+                          'BE Manufacturing': 'MANU'
                         }
                         return {
                           code: branchCodes[fullName] || fullName,
@@ -718,12 +742,24 @@ export default function Home() {
                   const yearKey = `year${selectedYear}`
                   const yearData = branchCoursesData.BE?.[yearKey]
                   if (yearData) {
-                    const branchKey = Object.keys(yearData).find(key => 
-                      key.toLowerCase().includes(selectedBranch.toLowerCase())
-                    )
-                    if (branchKey) {
-                      courseData = yearData[branchKey] || []
-                      branchName = `BE ${branchKey}`
+                    // Map short codes to full names
+                    const branchCodeMap = {
+                      'BIO': 'BE Biotechnology',
+                      'CHEM': 'BE Chemical', 
+                      'CIVIL': 'BE Civil',
+                      'CSE': 'BE Computer Science',
+                      'EEE': 'BE Electrical and Electronics',
+                      'ECE': 'BE Electronics and Communications',
+                      'ENI': 'BE Electronics and Instrumentation',
+                      'ENC': 'BE Electronics and Computer Engineering',
+                      'MECH': 'BE Mechanical',
+                      'MANU': 'BE Manufacturing'
+                    }
+                    
+                    const fullBranchName = branchCodeMap[selectedBranch]
+                    if (fullBranchName && yearData[fullBranchName]) {
+                      courseData = yearData[fullBranchName] || []
+                      branchName = `${fullBranchName}`
                     }
                   }
                 } else if (selectedProgram === 'MSC' && selectedMscBranch) {
@@ -737,11 +773,23 @@ export default function Home() {
                     const beData = branchCoursesData.BE?.year2
                     let beCourses = []
                     if (beData) {
-                      const branchKey = Object.keys(beData).find(key => 
-                        key.toLowerCase().includes(selectedBeBranch.toLowerCase())
-                      )
-                      if (branchKey) {
-                        beCourses = beData[branchKey] || []
+                      // Map short codes to full names
+                      const branchCodeMap = {
+                        'BIO': 'BE Biotechnology',
+                        'CHEM': 'BE Chemical', 
+                        'CIVIL': 'BE Civil',
+                        'CSE': 'BE Computer Science',
+                        'EEE': 'BE Electrical and Electronics',
+                        'ECE': 'BE Electronics and Communications',
+                        'ENI': 'BE Electronics and Instrumentation',
+                        'ENC': 'BE Electronics and Computer Engineering',
+                        'MECH': 'BE Mechanical',
+                        'MANU': 'BE Manufacturing'
+                      }
+                      
+                      const fullBranchName = branchCodeMap[selectedBeBranch]
+                      if (fullBranchName && beData[fullBranchName]) {
+                        beCourses = beData[fullBranchName] || []
                       }
                     }
                     courseData = [...mscData, ...beCourses]
@@ -761,7 +809,7 @@ export default function Home() {
                         'ENI': 'BE Electronics and Instrumentation',
                         'ENC': 'BE Electronics and Computer Engineering',
                         'MECH': 'BE Mechanical',
-                        'MAN': 'BE Manufacturing'
+                        'MANU': 'BE Manufacturing'
                       }
                       
                       const fullBranchName = branchCodeMap[selectedBeBranch]
@@ -779,11 +827,15 @@ export default function Home() {
                       Courses to be enrolled - {branchName}:
                     </h4>
                     <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                      {courseData.map((courseId, index) => (
-                        <span key={`${courseId}-${index}`} className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs font-medium">
-                          {courseId}
-                        </span>
-                      ))}
+                      {courseData.map((courseId, index) => {
+                        // Find the course name from allCourses
+                        const courseName = allCourses.find(course => course.id === courseId)?.name || courseId
+                        return (
+                          <span key={`${courseId}-${index}`} className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs font-medium" title={courseId}>
+                            {courseName}
+                          </span>
+                        )
+                      })}
                     </div>
                     <p className="text-xs text-gray-400 mt-3">
                       {courseData.length} courses will be added to your enrollment

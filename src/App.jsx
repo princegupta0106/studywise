@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
 
-
+import PageTransition from './components/PageTransition'
 import Home from './pages/Home'
 import Buy from './pages/Buy'
 import CourseList from './pages/CourseList'
@@ -38,23 +38,25 @@ function App() {
       <div>
         {!hideNavbar && <Navbar />}
         <main style={{ padding: '1rem' }}>
-          <Routes>
-            <Route path="/signin" element={<SignIn />} />
+          <PageTransition>
+            <Routes>
+              <Route path="/signin" element={<SignIn />} />
 
-            <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
-            <Route path="/buy" element={<RequireAuth><Buy /></RequireAuth>} />
-            <Route path="/course/:courseId" element={<RequireAuth><CourseList /></RequireAuth>} />
-            <Route path="/course/:courseId/item/:itemId" element={<RequireAuth><Content /></RequireAuth>} />
-            <Route path="/course/:courseId/category/:category" element={<RequireAuth><CategoryList /></RequireAuth>} />
-            <Route path="/course/:courseId/files" element={<RequireAuth><FilesDocuments /></RequireAuth>} />
-            <Route path="/chat" element={<RequireAuth><Chat /></RequireAuth>} />
-           
-            <Route path="/group-chats" element={<RequireAuth><GroupChatList /></RequireAuth>} />
-            <Route path="/group-chat/:gcId" element={<RequireAuth><GroupChatView /></RequireAuth>} />
-            <Route path="/links" element={<RequireAuth><Links /></RequireAuth>} />
-            <Route path="/seed" element={<RequireAuth><SeedPage /></RequireAuth>} />
-            <Route path="/admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
-          </Routes>
+              <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
+              <Route path="/buy" element={<RequireAuth><Buy /></RequireAuth>} />
+              <Route path="/course/:courseId" element={<RequireAuth><CourseList /></RequireAuth>} />
+              <Route path="/course/:courseId/item/:itemId" element={<RequireAuth><Content /></RequireAuth>} />
+              <Route path="/course/:courseId/category/:category" element={<RequireAuth><CategoryList /></RequireAuth>} />
+              <Route path="/course/:courseId/files" element={<RequireAuth><FilesDocuments /></RequireAuth>} />
+              <Route path="/chat-admin" element={<RequireAuth><Chat /></RequireAuth>} />
+             
+              <Route path="/group-chats" element={<RequireAuth><GroupChatList /></RequireAuth>} />
+              <Route path="/group-chat/:gcId" element={<RequireAuth><GroupChatView /></RequireAuth>} />
+              <Route path="/links" element={<RequireAuth><Links /></RequireAuth>} />
+              <Route path="/seed" element={<RequireAuth><SeedPage /></RequireAuth>} />
+              <Route path="/admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
+            </Routes>
+          </PageTransition>
         </main>
         <CacheDebugger />
       </div>
