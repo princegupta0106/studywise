@@ -143,7 +143,7 @@ const Navbar = () => {
             <button onClick={() => { setIsOpen(false); navigate(-1) }} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link">← Back</button>
             <Link onClick={() => setIsOpen(false)} to="/" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/') ? 'bg-white/10' : ''}`}>Home</Link>
             <Link onClick={() => setIsOpen(false)} to="/links" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/links') ? 'bg-white/10' : ''}`}>Links</Link>
-            <Link onClick={() => setIsOpen(false)} to="/chat" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/chat') ? 'bg-white/10' : ''}`}>Chat</Link>
+            <Link onClick={() => setIsOpen(false)} to="/group-chats" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/chat') ? 'bg-white/10' : ''}`}>Groups</Link>
             <Link onClick={() => setIsOpen(false)} to="/buy" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/buy') ? 'bg-white/10' : ''}`}>All Courses</Link>
             <Link onClick={() => setIsOpen(false)} to="/chat-admin" className={`block px-3 py-2 rounded-md text-base font-medium text-white mobile-nav-link ${isActiveLink('/chat-admin') ? 'bg-white/10' : ''}`}>Chat Admin</Link>
             <div className="pt-3 px-3" style={{borderTop: '1px solid var(--border)'}}>
