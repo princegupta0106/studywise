@@ -14,6 +14,14 @@ export default function SignIn() {
     if (user && !loading) {
       console.log('User authenticated in SignIn component, redirecting to:', from)
       navigate(from, { replace: true })
+      
+      // Additional safety: refresh after 1 second if still on sign in page
+      setTimeout(() => {
+        if (window.location.pathname === '/signin') {
+          console.log('Still on sign in page after 1 second, forcing refresh')
+          window.location.reload()
+        }
+      }, 1000)
     }
   }, [user, loading, navigate, from])
 
