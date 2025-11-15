@@ -15,7 +15,6 @@ import GroupChatList from './pages/GroupChatList'
 import GroupChatView from './pages/GroupChatView'
 import Links from './pages/Links'
 import Navbar from './components/Navbar'
-import CacheDebugger from './components/CacheDebugger'
 import SignIn from './pages/SignIn'
 import { useCachedAuth } from './contexts/CachedAuthContext'
 import { ToastProvider } from './contexts/ToastContext'
@@ -58,7 +57,6 @@ function App() {
             </Routes>
           </PageTransition>
         </main>
-        <CacheDebugger />
       </div>
     </ToastProvider>
   )
