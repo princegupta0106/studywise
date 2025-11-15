@@ -65,7 +65,7 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <div className="flex items-center space-x-3 logo-container transform transition-transform duration-300 ease-linear hover:scale-105">
               <Logo />
-              <Link to="/" className="font-bold text-lg brand-name hidden md:block hover:text-yellow-300 transition-colors ">Padho BC</Link>
+              <Link to="/" className="font-bold text-lg brand-name hidden md:block hover:text-yellow-300 transition-colors ">PadhoBC</Link>
             </div>
           </div>
         {/* Desktop Navigation */}
