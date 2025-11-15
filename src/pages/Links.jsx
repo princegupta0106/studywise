@@ -8,7 +8,7 @@ const Links = () => {
     { id: 3, name: 'Nalanda (Learning Management)', url: 'https://nalanda-aws.bits-pilani.ac.in/' },
     { id: 4, name: 'Library Website', url: 'https://library.bits-pilani.ac.in/' },
     { id: 5, name: 'ERP Portal', url: 'https://erp.bits-pilani.ac.in/' },
-    { id: 6, name: 'All Contacts (Auto, C\'not, Bits)', url: 'https://drive.google.com/drive/folders/1oS4xsbS79Rz80XG8ZOtSTD218O2gco9w' },
+    { id: 6, name: 'All Contacts (Auto, C\'not, Bits)', url: 'https://drive.google.com/drive/folders/1ztb8rnpBSwpcdBBoUjNIcvfufwHqjogQ?usp=sharing' },
     { id: 7, name: 'Padho BC WhatsApp Group', url: 'https://chat.whatsapp.com/I9Ozvy25HTKLBuD8YOBmft' },
     { id: 8, name: 'BITS WhatsApp Groups', url: 'https://docs.google.com/document/d/1tL7zCeyH2yUat_2_ICBjpvXb4bSNrlwRgCtVupe57hg/edit?usp=sharing' },
     
