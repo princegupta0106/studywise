@@ -102,7 +102,7 @@ export function AuthProvider({ children }) {
       
       console.log('Sign in successful:', userEmail)
       showNotification(`
-        <strong>Welcome to StudyWise!</strong><br/>
+        <strong>Welcome to Padho BC!</strong><br/>
         Successfully signed in as <strong>${userEmail}</strong>
       `, 'success', 4000)
     } catch (error) {

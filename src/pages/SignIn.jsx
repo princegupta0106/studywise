@@ -67,7 +67,7 @@ export default function SignIn() {
           }}>
             <img 
               src={logoSvg} 
-              alt="StudyWise Logo" 
+              alt="Padho BC Logo" 
               style={{ width: '48px', height: '48px' }}
             />
           </div>
@@ -79,7 +79,7 @@ export default function SignIn() {
             marginBottom: '8px',
             letterSpacing: '-0.5px'
           }}>
-            StudyWise
+            Padho BC
           </h1>
           <p style={{
             margin: 0,

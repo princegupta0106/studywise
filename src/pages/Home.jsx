@@ -527,7 +527,7 @@ export default function Home() {
         {courses.length === 0 ? (
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2" style={{color: '#c7c7c7'}}>Welcome to StudyWise!</h2>
+              <h2 className="text-2xl font-bold mb-2" style={{color: '#c7c7c7'}}>Welcome to Padho BC!</h2>
               <p className="text-gray-400 mb-6">Select your branch and year to get started with your courses</p>
             </div>
 
