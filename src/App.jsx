@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
 
 import PageTransition from './components/PageTransition'
+import AboutPage from './pages/AboutPage'
 import Home from './pages/Home'
 import Buy from './pages/Buy'
 import CourseList from './pages/CourseList'
@@ -36,9 +37,10 @@ function App() {
     <ToastProvider>
       <div>
         {!hideNavbar && <Navbar />}
-        <main style={{ padding: '1rem' }}>
+        <main style={{ padding: hideNavbar ? 0 : '1rem' }}>
           <PageTransition>
             <Routes>
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/signin" element={<SignIn />} />
 
               <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
