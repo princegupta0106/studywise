@@ -1,13 +1,15 @@
 User-agent: *
 Allow: /about
 Allow: /signin
+Allow: /
+Allow: /dashboard
+Allow: /buy
+Allow: /group-chats
+Allow: /links
+Allow: /sitemap.xml
 
 # Disallow authenticated home page and all protected routes
-Disallow: /
-Disallow: /dashboard
-Disallow: /buy
-Disallow: /group-chats
-Disallow: /links
+
 Disallow: /admin
 Disallow: /seed
 Disallow: /chat-admin
