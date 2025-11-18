@@ -157,6 +157,12 @@ export default function Buy() {
       // Clear user cache in background for future calls
       const { invalidateUserEnrollmentCache } = await import('../utils/localCache')
       invalidateUserEnrollmentCache(user.uid)
+      // If this was an enroll action, reload to reflect changes across pages
+      if (action === 'enroll') {
+        setTimeout(() => {
+          try { window.location.reload() } catch (e) { console.error('Reload failed', e) }
+        }, 800)
+      }
       
     } catch (e) {
       showNotification(`Failed to ${action}: ` + e.message, 'error')

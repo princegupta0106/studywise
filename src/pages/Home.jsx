@@ -244,6 +244,12 @@ export default function Home() {
       // Clear search results and search bar
       setSearchResults([])
       setSearchQuery('')
+      // If this action was an enroll, reload the page so other pages reflect change
+      if (action === 'enroll') {
+        setTimeout(() => {
+          try { window.location.reload() } catch (e) { console.error('Reload failed', e) }
+        }, 800)
+      }
       
     } catch (e) {
       showNotification(`Failed to ${action}: ` + e.message, 'error')

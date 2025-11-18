@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
 
 import PageTransition from './components/PageTransition'
@@ -18,11 +18,41 @@ import Links from './pages/Links'
 import Navbar from './components/Navbar'
 import SignIn from './pages/SignIn'
 import { useCachedAuth } from './contexts/CachedAuthContext'
+import { collection, onSnapshot } from 'firebase/firestore'
+import { db } from './firebase/config'
 import { ToastProvider } from './contexts/ToastContext'
 
 function App() {
   const location = useLocation()
   const { user, loading } = useCachedAuth() || {}
+
+  // Reload the site for all clients when courses collection changes (add/remove)
+  const coursesListenerInitialized = useRef(false)
+  useEffect(() => {
+    const coll = collection(db, 'courses')
+    const unsubscribe = onSnapshot(coll, (snapshot) => {
+      // Ignore the initial snapshot which reports existing docs as 'added'
+      if (!coursesListenerInitialized.current) {
+        coursesListenerInitialized.current = true
+        return
+      }
+
+      const changes = snapshot.docChanges()
+      const hasAddOrRemove = changes.some(c => c.type === 'added' || c.type === 'removed')
+      if (hasAddOrRemove) {
+        console.log('Detected courses add/remove — reloading page')
+        try {
+          window.location.reload()
+        } catch (e) {
+          console.error('Reload failed:', e)
+        }
+      }
+    }, (err) => {
+      console.error('Error listening to courses collection:', err)
+    })
+
+    return () => unsubscribe()
+  }, [])
 
   // Simple guard component to protect routes
   const RequireAuth = ({ children }) => {

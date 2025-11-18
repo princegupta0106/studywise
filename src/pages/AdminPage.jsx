@@ -108,6 +108,12 @@ export default function AdminPage() {
       setNewCourseDesc('')
       
       await loadCourses()
+      // Force a full window reload so all pages reflect the new course immediately
+      try {
+        window.location.reload()
+      } catch (e) {
+        console.error('Reload failed after createCourse:', e)
+      }
     } catch (e) {
       setStatus('Create course error: ' + (e.message || e))
     }
@@ -125,6 +131,12 @@ export default function AdminPage() {
         setCourseItems([])
       }
       await loadCourses()
+      // Force a full reload so all open pages show the updated course list
+      try {
+        window.location.reload()
+      } catch (e) {
+        console.error('Reload failed after deleteCourse:', e)
+      }
     } catch (e) {
       setStatus('Delete course error: ' + (e.message || e))
     }
