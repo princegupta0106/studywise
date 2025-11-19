@@ -28,6 +28,7 @@ function App() {
 
   // Reload the site for all clients when courses collection changes (add/remove)
   const coursesListenerInitialized = useRef(false)
+  const reloadTimeout = useRef(null)
   useEffect(() => {
     const coll = collection(db, 'courses')
     const unsubscribe = onSnapshot(coll, (snapshot) => {
@@ -37,21 +38,40 @@ function App() {
         return
       }
 
+      // Ignore if snapshot is from cache or has pending writes
+      if (snapshot.metadata.fromCache || snapshot.metadata.hasPendingWrites) {
+        return
+      }
+
       const changes = snapshot.docChanges()
       const hasAddOrRemove = changes.some(c => c.type === 'added' || c.type === 'removed')
       if (hasAddOrRemove) {
-        console.log('Detected courses add/remove — reloading page')
-        try {
-          window.location.reload()
-        } catch (e) {
-          console.error('Reload failed:', e)
+        console.log('Detected courses add/remove — scheduling reload')
+        
+        // Clear any existing timeout to prevent multiple reloads
+        if (reloadTimeout.current) {
+          clearTimeout(reloadTimeout.current)
         }
+        
+        // Debounce the reload by 500ms
+        reloadTimeout.current = setTimeout(() => {
+          try {
+            window.location.reload()
+          } catch (e) {
+            console.error('Reload failed:', e)
+          }
+        }, 500)
       }
     }, (err) => {
       console.error('Error listening to courses collection:', err)
     })
 
-    return () => unsubscribe()
+    return () => {
+      unsubscribe()
+      if (reloadTimeout.current) {
+        clearTimeout(reloadTimeout.current)
+      }
+    }
   }, [])
 
   // Simple guard component to protect routes

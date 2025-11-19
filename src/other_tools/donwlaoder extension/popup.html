@@ -4,25 +4,37 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>UL Href Bulk Downloader</title>
+    <title>Simple Folder Clicker</title>
     <style>
-      body { font-family: Arial, sans-serif; width:320px; margin:10px; }
-      button { margin:6px 0; padding:8px 10px; }
-      #links { max-height:240px; overflow:auto; border:1px solid #ddd; padding:6px; }
-      .link-item { font-size:0.9em; margin:4px 0; }
-      .filename { font-weight:600; }
-      .small { color:#666; font-size:0.8em; }
+      body { font-family: Arial, sans-serif; width:350px; margin:10px; }
+      button { margin:8px 0; padding:12px 16px; width: 100%; font-size: 16px; border-radius: 6px; border: none; cursor: pointer; }
+      .main-btn { background-color: #16a34a; color: white; }
+      .main-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+      .debug-btn { background-color: #3b82f6; color: white; }
+      .status { color:#666; font-size:14px; margin: 10px 0; padding: 8px; background-color: #f3f4f6; border-radius: 4px; }
+      .progress { margin: 10px 0; padding: 8px; background-color: #ecfdf5; border-radius: 4px; font-size: 14px; }
+      .folder-item { margin: 5px 0; padding: 6px; background-color: #f8fafc; border-radius: 3px; font-size: 13px; }
+      .clicked { background-color: #dcfce7; border-left: 4px solid #16a34a; }
     </style>
   </head>
   <body>
-    <h3>Bulk downloader</h3>
-    <div>
-      <label for="folderName">Folder name:</label>
-      <input type="text" id="folderName" placeholder="Enter folder name..." style="width:100%; margin:4px 0; padding:4px;">
-      <button id="downloadBtn" disabled>Download all to folder</button>
-    </div>
-    <div id="status" class="small">Auto-collecting links...</div>
-    <div id="links"></div>
+    <h2>📁 Simple Folder Clicker</h2>
+    
+    <p style="font-size: 14px; color: #666; margin: 10px 0;">
+      This extension will click on each folder sequentially with 0.2-second intervals.
+    </p>
+    
+    <button id="clickAllBtn" class="main-btn">
+      🖱️ Click All Folders (0.2 sec intervals)
+    </button>
+    
+    <button id="highlightBtn" class="debug-btn">
+      🔍 Preview Folders
+    </button>
+    
+    <div id="status" class="status">Ready to click folders...</div>
+    
+    <div id="progress"></div>
 
     <script src="popup.js"></script>
   </body>

@@ -71,11 +71,22 @@ export default function AdminPage() {
       chatListUnsubscribe()
     }
     
+    let chatUpdateTimeout
     // Listen to all chats collection for new chats/messages
     const chatsCollection = collection(db, 'chats')
     const unsubscribe = onSnapshot(chatsCollection, (snapshot) => {
+      // Ignore initial/cached snapshots
+      if (snapshot.metadata.fromCache || snapshot.metadata.hasPendingWrites) {
+        return
+      }
+      
       console.log('🔄 Real-time chat update detected')
-      loadChatUsers() // Reload chat users when any chat changes
+      
+      // Debounce chat updates to prevent rapid successive calls
+      if (chatUpdateTimeout) clearTimeout(chatUpdateTimeout)
+      chatUpdateTimeout = setTimeout(() => {
+        loadChatUsers() // Reload chat users when any chat changes
+      }, 300)
     }, (error) => {
       console.error('Error listening to chats:', error)
       setStatus('Error setting up real-time chat updates: ' + error.message)
@@ -108,12 +119,16 @@ export default function AdminPage() {
       setNewCourseDesc('')
       
       await loadCourses()
-      // Force a full window reload so all pages reflect the new course immediately
-      try {
-        window.location.reload()
-      } catch (e) {
-        console.error('Reload failed after createCourse:', e)
-      }
+      // Force a full window reload so all pages reflect the new course immediately (debounced)
+      setTimeout(() => {
+        try {
+          if (document.visibilityState === 'visible') {
+            window.location.reload()
+          }
+        } catch (e) {
+          console.error('Reload failed after createCourse:', e)
+        }
+      }, 500)
     } catch (e) {
       setStatus('Create course error: ' + (e.message || e))
     }

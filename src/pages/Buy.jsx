@@ -159,9 +159,17 @@ export default function Buy() {
       invalidateUserEnrollmentCache(user.uid)
       // If this was an enroll action, reload to reflect changes across pages
       if (action === 'enroll') {
+        // Debounce reload to prevent rapid successive reloads
         setTimeout(() => {
-          try { window.location.reload() } catch (e) { console.error('Reload failed', e) }
-        }, 800)
+          try { 
+            // Only reload if user is still on the page and it's visible
+            if (document.visibilityState === 'visible') {
+              window.location.reload() 
+            }
+          } catch (e) { 
+            console.error('Reload failed', e) 
+          }
+        }, 1200)
       }
       
     } catch (e) {

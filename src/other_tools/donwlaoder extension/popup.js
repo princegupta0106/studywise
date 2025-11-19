@@ -1,84 +1,156 @@
-// popup.js
-const downloadBtn = document.getElementById('downloadBtn');
-const folderNameInput = document.getElementById('folderName');
-const linksDiv = document.getElementById('links');
+// popup.js - Simple Folder Clicker
+const clickAllBtn = document.getElementById('clickAllBtn');
+const highlightBtn = document.getElementById('highlightBtn');
 const status = document.getElementById('status');
+const progress = document.getElementById('progress');
 
-let currentLinks = [];
+let availableFolders = [];
 
-function setStatus(text) { status.textContent = text; }
+function setStatus(text) { 
+  status.textContent = text; 
+  console.log(text);
+}
 
-// Auto-collect links when popup opens
-async function autoCollectLinks() {
-  setStatus('Collecting links...');
-  linksDiv.innerHTML = '';
-  downloadBtn.disabled = true;
+function updateProgress(text) {
+  progress.innerHTML = text;
+}
 
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tabs || tabs.length === 0) {
-    setStatus('No active tab found');
+// Check for available folders
+async function checkForFolders() {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tabs || tabs.length === 0) {
+      setStatus('No active tab found');
+      return;
+    }
+    
+    const tab = tabs[0];
+    chrome.tabs.sendMessage(tab.id, { type: 'getFolders' }, (resp) => {
+      if (chrome.runtime.lastError) {
+        setStatus('Extension not ready. Please refresh the page.');
+        return;
+      }
+      if (resp && resp.ok && resp.folders && resp.folders.length > 0) {
+        availableFolders = resp.folders;
+        clickAllBtn.disabled = false;
+        setStatus(`Ready! Found ${resp.folders.length} folders to click: ${resp.folders.join(', ')}`);
+        
+        // Show folder preview
+        updateProgress(`
+          <div style="font-weight: bold; margin-bottom: 8px;">📂 Found ${resp.folders.length} folders:</div>
+          ${resp.folders.map((folder, index) => 
+            `<div class="folder-item" id="folder-${index}">
+              ${index + 1}. ${folder}
+            </div>`
+          ).join('')}
+        `);
+      } else {
+        setStatus('No folders found on this page');
+        updateProgress('');
+      }
+    });
+  } catch (error) {
+    setStatus('Error: ' + error.message);
+  }
+}
+
+// Highlight folders for preview
+async function highlightFolders() {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tabs || tabs.length === 0) return;
+    
+    const tab = tabs[0];
+    chrome.tabs.sendMessage(tab.id, { type: 'highlightFolders' }, (resp) => {
+      if (resp && resp.ok) {
+        setStatus(`✨ ${resp.message} highlighted on the page!`);
+      } else {
+        setStatus('Failed to highlight folders');
+      }
+    });
+  } catch (error) {
+    setStatus('Error highlighting folders: ' + error.message);
+  }
+}
+
+// Click all folders sequentially
+async function clickAllFolders() {
+  if (availableFolders.length === 0) {
+    setStatus('No folders found. Please refresh and try again.');
     return;
   }
-  const tab = tabs[0];
-  chrome.tabs.sendMessage(tab.id, { type: 'collectLinks' }, (resp) => {
-    if (!resp) {
-      setStatus('No response from page. Make sure the extension is allowed to run on this site.');
+  
+  setStatus('🚀 Starting to click all folders...');
+  clickAllBtn.disabled = true;
+  highlightBtn.disabled = true;
+  
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tabs || tabs.length === 0) {
+      setStatus('No active tab found');
+      clickAllBtn.disabled = false;
+      highlightBtn.disabled = false;
       return;
     }
-    if (!resp.ok) {
-      setStatus('Error collecting links: ' + resp.error);
-      return;
-    }
-    currentLinks = resp.links || [];
-    if (currentLinks.length === 0) {
-      setStatus('No links found inside ResourceList ULs on this page.');
-      return;
-    }
-    setStatus(`${currentLinks.length} links collected. Enter folder name and click download.`);
-    downloadBtn.disabled = false;
-    // render list
-    currentLinks.forEach((l, i) => {
-      const div = document.createElement('div');
-      div.className = 'link-item';
-      div.innerHTML = `<span class="filename">${escapeHtml(l.filename)}</span> <span class="small">— ${escapeHtml(l.href)}</span>`;
-      linksDiv.appendChild(div);
+    
+    const tab = tabs[0];
+    
+    // Listen for click progress messages
+    const messageListener = (message, sender, sendResponse) => {
+      if (message.type === 'folderClicked') {
+        const { folderName, folderIndex, totalFolders, isLast } = message;
+        
+        setStatus(`🖱️ Clicked ${folderIndex}/${totalFolders}: ${folderName}`);
+        
+        // Update visual progress
+        const folderElement = document.getElementById(`folder-${folderIndex - 1}`);
+        if (folderElement) {
+          folderElement.classList.add('clicked');
+          folderElement.innerHTML = `✅ ${folderIndex}. ${folderName}`;
+        }
+        
+        if (isLast) {
+          chrome.runtime.onMessage.removeListener(messageListener);
+          setStatus(`🎉 Completed! Clicked all ${totalFolders} folders successfully.`);
+          clickAllBtn.disabled = false;
+          highlightBtn.disabled = false;
+        }
+      }
+    };
+    
+    // Add message listener
+    chrome.runtime.onMessage.addListener(messageListener);
+    
+    // Start clicking process
+    chrome.tabs.sendMessage(tab.id, { type: 'clickAllFolders' }, (resp) => {
+      if (chrome.runtime.lastError) {
+        setStatus('Error: Please refresh the page and try again.');
+        clickAllBtn.disabled = false;
+        highlightBtn.disabled = false;
+        chrome.runtime.onMessage.removeListener(messageListener);
+        return;
+      }
+      if (!resp || !resp.ok) {
+        setStatus('Error starting click process: ' + (resp ? resp.error : 'No response'));
+        clickAllBtn.disabled = false;
+        highlightBtn.disabled = false;
+        chrome.runtime.onMessage.removeListener(messageListener);
+        return;
+      }
+      
+      setStatus('⏳ Clicking folders in progress...');
     });
-  });
-}
-
-downloadBtn.addEventListener('click', async () => {
-  if (!currentLinks || currentLinks.length === 0) return;
-  
-  const folderName = folderNameInput.value.trim() || 'downloads';
-  const sanitizedFolder = sanitizeFilename(folderName);
-  
-  downloadBtn.disabled = true;
-  setStatus('Starting downloads...');
-  let success = 0;
-  for (const l of currentLinks) {
-    try {
-      await chrome.downloads.download({
-        url: l.href,
-        filename: `${sanitizedFolder}/${sanitizeFilename(l.filename)}`,
-        conflictAction: 'uniquify',
-        saveAs: false
-      });
-      success++;
-    } catch (e) {
-      console.warn('download failed', e, l);
-    }
+    
+  } catch (error) {
+    setStatus('Error: ' + error.message);
+    clickAllBtn.disabled = false;
+    highlightBtn.disabled = false;
   }
-  setStatus(`Requested ${success}/${currentLinks.length} downloads to folder "${sanitizedFolder}". Check Chrome's Downloads.`);
-});
-
-// Auto-collect when popup loads
-document.addEventListener('DOMContentLoaded', autoCollectLinks);
-
-function sanitizeFilename(name) {
-  // keep it simple: remove slashes and line breaks
-  return name.replace(/[\\/\n\r]+/g, '_');
 }
 
-function escapeHtml(s) {
-  return (s + '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
-}
+// Event listeners
+clickAllBtn.addEventListener('click', clickAllFolders);
+highlightBtn.addEventListener('click', highlightFolders);
+
+// Auto-check for folders when popup loads
+document.addEventListener('DOMContentLoaded', checkForFolders);

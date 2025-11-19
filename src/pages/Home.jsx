@@ -157,10 +157,19 @@ export default function Home() {
         }
       }, 30000) // Refresh every 30 seconds when page is visible
       
-      // Refresh data when user returns to the tab/window
+      // Refresh data when user returns to the tab/window (debounced)
+      let visibilityTimeout
       const handleVisibilityChange = () => {
         if (!document.hidden && mounted && user) {
-          loadHomeData(true) // Force refresh when tab becomes active
+          // Clear existing timeout to prevent multiple rapid calls
+          if (visibilityTimeout) clearTimeout(visibilityTimeout)
+          
+          // Debounce visibility changes by 200ms
+          visibilityTimeout = setTimeout(() => {
+            if (mounted && user) {
+              loadHomeData(true) // Force refresh when tab becomes active
+            }
+          }, 200)
         }
       }
       
@@ -170,6 +179,9 @@ export default function Home() {
         mounted = false
         if (refreshInterval) {
           clearInterval(refreshInterval)
+        }
+        if (visibilityTimeout) {
+          clearTimeout(visibilityTimeout)
         }
         document.removeEventListener('visibilitychange', handleVisibilityChange)
       }
@@ -246,9 +258,17 @@ export default function Home() {
       setSearchQuery('')
       // If this action was an enroll, reload the page so other pages reflect change
       if (action === 'enroll') {
+        // Debounce reload to prevent rapid successive reloads
         setTimeout(() => {
-          try { window.location.reload() } catch (e) { console.error('Reload failed', e) }
-        }, 800)
+          try { 
+            // Only reload if user is still on the page
+            if (document.visibilityState === 'visible') {
+              window.location.reload() 
+            }
+          } catch (e) { 
+            console.error('Reload failed', e) 
+          }
+        }, 1200)
       }
       
     } catch (e) {

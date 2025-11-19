@@ -1,12 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "UL Href Bulk Downloader",
-  "version": "1.0",
-  "description": "Collects all hrefs inside ULs with ResourceList class and downloads them in bulk.",
-  "permissions": ["downloads","activeTab","scripting"],
-  "host_permissions": ["<all_urls>"],
+  "name": "Course Bulk Downloader",
+  "version": "1.1",
+  "description": "Downloads entire courses by automatically expanding folders and collecting all files.",
+  "permissions": [
+    "downloads",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "Course Bulk Downloader"
   },
   "content_scripts": [
     {
