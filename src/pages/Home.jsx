@@ -101,6 +101,7 @@ export default function Home() {
   const typewriterText = useTypewriter(searchTexts, 100, 50, 1500)
 
   // Function to load/reload all home data
+  const [isLoadingHomeData, setIsLoadingHomeData] = useState(false)
   const loadHomeData = async (forceRefresh = false) => {
     if (!user) {
       setCourses([])
@@ -108,6 +109,13 @@ export default function Home() {
       return
     }
     
+    // Prevent multiple simultaneous calls
+    if (isLoadingHomeData) {
+      console.log('Skipping loadHomeData - already loading')
+      return
+    }
+    
+    setIsLoadingHomeData(true)
     try {
       // Step 1: Get user data (force refresh if needed)
       const userData = await getUserById(user.uid, forceRefresh)
@@ -124,17 +132,24 @@ export default function Home() {
       }))
       setAllCourses(allCoursesData)
       
-      // Step 3: Get enrolled course details (each uses localStorage cache internally)
-      const courseObjs = await Promise.all(
-        courseIds.map(async (cid) => {
-          const c = await getCourse(cid)
-          return c ? { id: cid, ...c } : null
-        })
-      )
-      setCourses(courseObjs.filter(Boolean))
+      // Step 3: Get enrolled course details (batch to prevent duplicate individual calls)
+      if (courseIds.length > 0) {
+        console.log(`📚 Loading ${courseIds.length} enrolled courses`)
+        const courseObjs = await Promise.all(
+          courseIds.map(async (cid) => {
+            const c = await getCourse(cid)
+            return c ? { id: cid, ...c } : null
+          })
+        )
+        setCourses(courseObjs.filter(Boolean))
+      } else {
+        setCourses([])
+      }
       
     } catch (error) {
       console.error('Error loading home data:', error)
+    } finally {
+      setIsLoadingHomeData(false)
     }
   }
 
@@ -150,12 +165,12 @@ export default function Home() {
     if (user) {
       load()
       
-      // Set up periodic refresh every 30 seconds to keep data fresh
+      // Set up periodic refresh every 60 seconds to keep data fresh
       refreshInterval = setInterval(() => {
-        if (mounted && user && !document.hidden) {
+        if (mounted && user && !document.hidden && !isLoadingHomeData) {
           loadHomeData(true)
         }
-      }, 30000) // Refresh every 30 seconds when page is visible
+      }, 60000) // Refresh every 60 seconds when page is visible
       
       // Refresh data when user returns to the tab/window (debounced)
       let visibilityTimeout
@@ -166,7 +181,7 @@ export default function Home() {
           
           // Debounce visibility changes by 200ms
           visibilityTimeout = setTimeout(() => {
-            if (mounted && user) {
+            if (mounted && user && !isLoadingHomeData) {
               loadHomeData(true) // Force refresh when tab becomes active
             }
           }, 200)
@@ -198,12 +213,12 @@ export default function Home() {
     }
   }, [user])
   
-  // Reload data when navigating back to Home page
-  useEffect(() => {
-    if (user) {
-      loadHomeData(true) // Force refresh when location changes (coming back from other pages)
-    }
-  }, [location.pathname, user])
+  // Remove location-based reload to prevent excessive re-renders
+  // useEffect(() => {
+  //   if (user) {
+  //     loadHomeData(true) // Force refresh when location changes (coming back from other pages)
+  //   }
+  // }, [location.pathname, user])
 
   // Fuzzy search functionality with typo tolerance
   useEffect(() => {
